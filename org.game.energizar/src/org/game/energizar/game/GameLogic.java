@@ -1,5 +1,8 @@
 package org.game.energizar.game;
 
+import java.util.Enumeration;
+import java.util.Vector;
+
 public class GameLogic {
 
 	// Singleton field
@@ -14,8 +17,16 @@ public class GameLogic {
 	}
 
 	public void process(GameLevel _gameData) {
-		// TODO Auto-generated method stub
+
+		Vector objects = _gameData.objects();
+		for (Enumeration e = objects.elements(); e.hasMoreElements();) {
+			OBJ o = (OBJ) e.nextElement();
+
+			if (o.getTimer() != null) {
+				o.getTimer().tick();
+			}
+
+		}
 
 	}
-
 }

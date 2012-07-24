@@ -7,20 +7,8 @@ import net.rim.device.api.system.Display;
 // that are the same for all objects, whether its the hero, enemies, or photons
 public class OBJ {
 
-	int _posX, _posY; // All objects have position and velocity
-
-	Bitmap _bitmap; // Bitmap to be drawn for the object
-
-	// Objects are initialized globally with a position
-	OBJ(int x, int y, Bitmap bitmap) {
-		this._posX = x;
-		this._posY = y;
-		this._bitmap = bitmap;
-	}
-
-	public Bitmap getBitmap() {
-		return _bitmap;
-	}
+	// FEATURE posição
+	int _posX = -1, _posY = -1; // posição
 
 	public int getX() {
 		return _posX;
@@ -28,6 +16,50 @@ public class OBJ {
 
 	public int getY() {
 		return _posY;
+	}
+
+	public void setPos(int x, int y) {
+		this._posX = x;
+		this._posY = y;
+	}
+
+	// FEATURE Bitmap
+	Bitmap _bitmap = null; // bitmap que representa o objeto
+
+	public Bitmap getBitmap() {
+		return _bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this._bitmap = bitmap;
+	}
+
+	// FEATURE Direção
+	private Direction _direction = null;
+
+	public Direction getDirection() {
+		return _direction;
+	}
+
+	void setDirection(Direction _direction) {
+		this._direction = _direction;
+	}
+
+	// FEATURE Timer
+	private Timer _timer;
+
+	Timer getTimer() {
+		return _timer;
+	}
+
+	void setTimer(Timer _timer) {
+		this._timer = _timer;
+	}
+
+	/**
+	 * Cria um objeto como a posição x, y e bitmap bitmap.
+	 */
+	OBJ() {
 	}
 
 	// A quick method simply to ensure screen bound objects don't go off screen.

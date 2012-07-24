@@ -17,7 +17,30 @@ public class OBJFactory {
 
 	// cria um objeto do tipo 'junction'
 	public OBJ createJunction(int x, int y) {
-		return new OBJ(x, y, Bitmap.getBitmapResource("explosao.png"));
-	}
 
+		final OBJ obj = new OBJ() {
+			public Bitmap getBitmap() {
+				switch (this.getDirection().value) {
+				case Direction.VALUE_UP:
+					return Bitmap.getBitmapResource("heroi.png");
+				case Direction.VALUE_DOWN:
+					return Bitmap.getBitmapResource("inimigo.png");
+				default:
+					return super.getBitmap();
+				}
+			}
+		};
+		obj.setPos(x, y);
+		obj.setBitmap(Bitmap.getBitmapResource("explosao.png"));
+		obj.setDirection(Direction.Left);
+
+		obj.setTimer(new Timer(10, new Runnable() {
+			public void run() {
+				obj.setDirection(obj.getDirection().RotateCW());
+				obj.getTimer().reset();
+			}
+		}));
+
+		return obj;
+	}
 }

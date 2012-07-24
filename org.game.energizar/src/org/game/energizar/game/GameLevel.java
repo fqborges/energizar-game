@@ -2,7 +2,8 @@ package org.game.energizar.game;
 
 import java.util.Vector;
 
-import util.StringUtil;
+import org.game.energizar.util.StringUtil;
+
 
 public class GameLevel {
 

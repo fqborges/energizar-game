@@ -1,4 +1,4 @@
-package org.game.energizar;
+package org.game.energizar.modules;
 
 
 import java.io.InputStream;

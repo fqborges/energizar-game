@@ -19,19 +19,20 @@ public class OBJFactory {
 	public OBJ createJunction(int x, int y) {
 
 		final OBJ obj = new OBJ() {
-			public Bitmap getBitmap() {
+			public Bitmap getSpriteBitmap() {
 				switch (this.getDirection().value) {
 				case Direction.VALUE_UP:
-					return Bitmap.getBitmapResource("heroi.png");
+					this._bitmap = Bitmap.getBitmapResource("heroi.png");
+					break;
 				case Direction.VALUE_DOWN:
-					return Bitmap.getBitmapResource("inimigo.png");
-				default:
-					return super.getBitmap();
+					this._bitmap = Bitmap.getBitmapResource("inimigo.png");
+					break;
 				}
+				return super.getSpriteBitmap();
 			}
 		};
 		obj.setPos(x, y);
-		obj.setBitmap(Bitmap.getBitmapResource("explosao.png"));
+		obj.setSpriteBitmap(Bitmap.getBitmapResource("explosao.png"));
 		obj.setDirection(Direction.Left);
 
 		obj.setTimer(new Timer(10, new Runnable() {
@@ -43,4 +44,32 @@ public class OBJFactory {
 
 		return obj;
 	}
+
+	public OBJ createStartPoint(int x, int y) {
+		final OBJ obj = new OBJ() {
+			public Bitmap getSpriteBitmap() {
+				switch (this.getDirection().value) {
+				case Direction.VALUE_UP:
+					return Bitmap.getBitmapResource("heroi.png");
+				case Direction.VALUE_DOWN:
+					return Bitmap.getBitmapResource("inimigo.png");
+				default:
+					return super.getSpriteBitmap();
+				}
+			}
+		};
+		obj.setPos(x, y);
+		obj.setSpriteBitmap(Bitmap.getBitmapResource("explosao.png"));
+		obj.setDirection(Direction.Left);
+
+		obj.setTimer(new Timer(10, new Runnable() {
+			public void run() {
+				obj.setDirection(obj.getDirection().RotateCW());
+				obj.getTimer().reset();
+			}
+		}));
+
+		return obj;
+	}
+
 }

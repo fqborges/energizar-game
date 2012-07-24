@@ -7,6 +7,7 @@ import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.FontFamily;
 import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.XYRect;
 
 import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.OBJ;
@@ -80,40 +81,63 @@ public class GFX {
 		// _backgroundBM, 0, 0);
 		// }
 
+		// Tamanho da área de desenho
+		int canvasWidth = g.getClippingRect().width;
+		int canvasHeigth = g.getClippingRect().height;
+
 		// Calcula o tamanho, em pixels, de um espaço do level
-		int blockWidth = Display.getWidth() / gameData.getWidth();
-		int blockHeight = Display.getHeight() / gameData.getHeigth();
+		int blockWidth = canvasWidth / gameData.getWidth();
+		int blockHeight = canvasHeigth / gameData.getHeigth();
 		// normaliza para o menor tamanho
 		if (blockWidth > blockHeight) {
 			blockWidth = blockHeight;
 		} else {
 			blockHeight = blockWidth;
 		}
+
 		// calcula os deslocamentos para que possa centralizar a tela.
 		// o deslocamento é metade do que sobra entre o level e o display.
-		int xOffset = (Display.getWidth() - (blockWidth * gameData.getWidth())) / 2;
-		int yOffset = (Display.getHeight() - (blockHeight * gameData
-				.getHeigth())) / 2;
+		int xOffset = (canvasWidth - (blockWidth * gameData.getWidth())) / 2;
+		int yOffset = (canvasHeigth - (blockHeight * gameData.getHeigth())) / 2;
 
 		// desenha as bordas do level
 		g.drawRect(xOffset, yOffset, blockWidth * gameData.getWidth(),
 				blockHeight * gameData.getHeigth());
 
+		// cria um bitmap para ser a área de desenho
+		// Bitmap layer = new Bitmap(canvasWidth, canvasHeigth);
+		// layer.createAlpha();
+
 		// cria um bitmap para ser o buffer dos blocos
 		Bitmap block = new Bitmap(blockWidth, blockHeight);
 		block.createAlpha();
+
 		// Desenha todos objetos na tela
 		Vector objects = gameData.objects();
 		for (int lcv = 0; lcv < objects.size(); lcv++) {
 
 			OBJ obj = (OBJ) objects.elementAt(lcv);
+			Bitmap spriteBitmap = obj.getSpriteBitmap();
+			XYRect spriteRect = obj.getSpriteRect();
 
-			obj.getBitmap().scaleInto(block, Bitmap.FILTER_BILINEAR);
+			spriteBitmap.scaleInto(spriteRect.x, spriteRect.y,
+					spriteRect.width, spriteRect.height, block, 0, 0,
+					blockWidth, blockHeight, Bitmap.FILTER_BILINEAR);
+
+			// block.scaleInto(layer, Bitmap.FILTER_BILINEAR);
+
+			// obj.getSpriteBitmap().scaleInto(0, 0, blockWidth, blockHeight,
+			// layer, xOffset + obj.getX() * blockWidth,
+			// yOffset + obj.getY() * blockHeight, blockWidth,
+			// blockHeight, Bitmap.FILTER_BILINEAR);
 
 			g.drawBitmap(xOffset + obj.getX() * blockWidth,
 					yOffset + obj.getY() * blockHeight, block.getWidth(),
 					block.getHeight(), block, 0, 0);
 		}
+
+		// desenha o buffer na tela
+		// g.drawBitmap(0, 0, layer.getWidth(), layer.getHeight(), layer, 0, 0);
 
 		// // Draw score
 		// String zeroPad;

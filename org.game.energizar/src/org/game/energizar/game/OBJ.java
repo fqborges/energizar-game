@@ -2,6 +2,7 @@ package org.game.energizar.game;
 
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.Display;
+import net.rim.device.api.ui.XYRect;
 
 // OBJ is our root class for all objects, it defines behaviors and properties
 // that are the same for all objects, whether its the hero, enemies, or photons
@@ -23,15 +24,19 @@ public class OBJ {
 		this._posY = y;
 	}
 
-	// FEATURE Bitmap
+	// FEATURE Sprite
 	Bitmap _bitmap = null; // bitmap que representa o objeto
 
-	public Bitmap getBitmap() {
+	public Bitmap getSpriteBitmap() {
 		return _bitmap;
 	}
 
-	public void setBitmap(Bitmap bitmap) {
+	public void setSpriteBitmap(Bitmap bitmap) {
 		this._bitmap = bitmap;
+	}
+
+	public XYRect getSpriteRect() {
+		return new XYRect(0, 0, _bitmap.getWidth(), _bitmap.getHeight());
 	}
 
 	// FEATURE Direção

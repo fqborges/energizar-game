@@ -13,7 +13,7 @@ public class GameLogic {
 	private GameLogic() {
 	}
 
-	public void process(GameData _gameData) {
+	public void process(GameLevel _gameData) {
 		// TODO Auto-generated method stub
 
 	}

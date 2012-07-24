@@ -15,9 +15,9 @@ public class OBJFactory {
 	private OBJFactory() {
 	}
 
-	public OBJ createJunction() {
-
-		return new OBJ(20, 20, Bitmap.getBitmapResource("explosao.png"));
+	// cria um objeto do tipo 'junction'
+	public OBJ createJunction(int x, int y) {
+		return new OBJ(x, y, Bitmap.getBitmapResource("explosao.png"));
 	}
 
 }

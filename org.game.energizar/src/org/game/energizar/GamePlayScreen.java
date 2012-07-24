@@ -1,13 +1,12 @@
 package org.game.energizar;
 
 import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.Keypad;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.container.FullScreen;
 
-import org.game.energizar.game.GameData;
+import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.GameLogic;
-import org.game.energizar.game.OBJ;
-import org.game.energizar.game.OBJFactory;
 import org.game.energizar.modules.GFX;
 import org.game.energizar.modules.INPUT;
 
@@ -26,7 +25,7 @@ import org.game.energizar.modules.INPUT;
 public class GamePlayScreen extends FullScreen {
 
 	// dados persistentes do jogo
-	private GameData _gameData;
+	private GameLevel _gameLevel;
 
 	// instância do game loop
 	GamePlayLoop _gameLoop;
@@ -35,10 +34,8 @@ public class GamePlayScreen extends FullScreen {
 	// executa o loop do jogo
 	public GamePlayScreen() {
 
-		_gameData = new GameData();
-		OBJ junction = OBJFactory.instance().createJunction();
-		_gameData.objects().addElement(junction);
-		_gameData.setCurrentObject(junction);
+		// level corrente
+		_gameLevel = new GameLevel();
 
 		// inicializa a instância do gameloop
 		_gameLoop = new GamePlayLoop();
@@ -58,13 +55,13 @@ public class GamePlayScreen extends FullScreen {
 		// This method defines what this thread does every time it runs.
 		public void run() {
 			// This thread runs while the game is active
-			while (_gameData.isGameActive()) {
+			while (_gameLevel.isGameActive()) {
 
 				// processa as interações do usuário.
-				INPUT.instance().process(_gameData);
+				INPUT.instance().process(_gameLevel);
 
 				// aplica as regras do jogo
-				GameLogic.instance().process(_gameData);
+				GameLogic.instance().process(_gameLevel);
 
 				// causa o redesenho da tela.
 				// gera uma execução do método paint
@@ -97,16 +94,16 @@ public class GamePlayScreen extends FullScreen {
 	// We have it passing the graphics object over to our graphics engine so our
 	// custom graphics routines can take care of any drawing necessary.
 	protected void paint(Graphics graphics) {
-		GFX.instance().process(graphics, _gameData);
+		GFX.instance().process(graphics, _gameLevel);
 	}
 
-	
-	
 	// The keyChar method is called by the event handler when a key is pressed.
 	public boolean keyChar(char key, int status, int time) {
 		return INPUT.instance().receiveKeyChar(key, status, time);
 
 	}
+	
+	Keypad s;
 
 	// The navigationMovement method is called by the event handler when the
 	// trackball is used.

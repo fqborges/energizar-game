@@ -57,23 +57,19 @@ public class OBJ {
 	}
 
 	public void moveUp() {
-		this._posY -= 10;
-		boundToScreen();
+		this._posY -= 1;
 	}
 
 	public void moveDown() {
-		this._posY += 10;
-		boundToScreen();
+		this._posY += 1;
 	}
 
 	public void moveLeft() {
-		this._posX -= 10;
-		boundToScreen();
+		this._posX -= 1;
 	}
 
 	public void moveRight() {
-		this._posX += 10;
-		boundToScreen();
+		this._posX += 1;
 	}
 
 	// // Collision detection routine using an AABB test (Axis Align Bounding

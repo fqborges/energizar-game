@@ -2,13 +2,14 @@ package org.game.energizar.modules;
 
 import java.util.Vector;
 
-import org.game.energizar.game.GameData;
-import org.game.energizar.game.OBJ;
-
 import net.rim.device.api.system.Bitmap;
+import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.FontFamily;
 import net.rim.device.api.ui.Graphics;
+
+import org.game.energizar.game.GameLevel;
+import org.game.energizar.game.OBJ;
 
 // The GFX class is our game's graphics engine with all the drawing routines
 public class GFX {
@@ -56,7 +57,7 @@ public class GFX {
 
 	// Primary function for the graphics engine, draws all the objects, text,
 	// health, etc
-	public void process(Graphics passGraphics, GameData gameData) {
+	public void process(Graphics g, GameLevel gameData) {
 		// // Draw our background at the correct position
 		// passGraphics.drawBitmap(0, 0, Display.getWidth(),
 		// Display.getHeight(),
@@ -79,14 +80,39 @@ public class GFX {
 		// _backgroundBM, 0, 0);
 		// }
 
+		// Calcula o tamanho, em pixels, de um espaço do level
+		int blockWidth = Display.getWidth() / gameData.getWidth();
+		int blockHeight = Display.getHeight() / gameData.getHeigth();
+		// normaliza para o menor tamanho
+		if (blockWidth > blockHeight) {
+			blockWidth = blockHeight;
+		} else {
+			blockHeight = blockWidth;
+		}
+		// calcula os deslocamentos para que possa centralizar a tela.
+		// o deslocamento é metade do que sobra entre o level e o display.
+		int xOffset = (Display.getWidth() - (blockWidth * gameData.getWidth())) / 2;
+		int yOffset = (Display.getHeight() - (blockHeight * gameData
+				.getHeigth())) / 2;
+
+		// desenha as bordas do level
+		g.drawRect(xOffset, yOffset, blockWidth * gameData.getWidth(),
+				blockHeight * gameData.getHeigth());
+
+		// cria um bitmap para ser o buffer dos blocos
+		Bitmap block = new Bitmap(blockWidth, blockHeight);
+		block.createAlpha();
+		// Desenha todos objetos na tela
 		Vector objects = gameData.objects();
-		// Now draw each of our objects to the screen
 		for (int lcv = 0; lcv < objects.size(); lcv++) {
-			passGraphics.drawBitmap(((OBJ) objects.elementAt(lcv)).getX(),
-					((OBJ) objects.elementAt(lcv)).getY(),
-					((OBJ) objects.elementAt(lcv)).getBitmap().getWidth(),
-					((OBJ) objects.elementAt(lcv)).getBitmap().getHeight(),
-					((OBJ) objects.elementAt(lcv)).getBitmap(), 0, 0);
+
+			OBJ obj = (OBJ) objects.elementAt(lcv);
+
+			obj.getBitmap().scaleInto(block, Bitmap.FILTER_BILINEAR);
+
+			g.drawBitmap(xOffset + obj.getX() * blockWidth,
+					yOffset + obj.getY() * blockHeight, block.getWidth(),
+					block.getHeight(), block, 0, 0);
 		}
 
 		// // Draw score
@@ -117,5 +143,4 @@ public class GFX {
 		// * ((OBJ) passObjects.elementAt(0)).getLife() / 5,
 		// _healthBM.getHeight(), _healthBM, 0, 0);
 	}
-
 }

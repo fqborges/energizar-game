@@ -19,118 +19,133 @@ public class GameLogic {
 	private GameLogic() {
 	}
 
-	public void process(GameLevel gameData, int miliseconds) {
+	public void process(GameLevel gameLevel, int miliseconds) {
 
-		Vector objects = gameData.objects();
+		// objects to be deleted
+		Vector objsToBeDeleted = new Vector();
+
+		// objects in level
+		Vector objsInLevel = gameLevel.objects();
+
 		// notifica os elementos de que o tempo passou
-		for (Enumeration e = objects.elements(); e.hasMoreElements();) {
-			OBJ o = (OBJ) e.nextElement();
+		// e dá a cance de atualizarem seu estado
+		for (Enumeration e = objsInLevel.elements(); e.hasMoreElements();) {
+			OBJ obj = (OBJ) e.nextElement();
 
 			// notifica o timer do elemento
-			if (o.getTimer() != null) {
-				o.getTimer().tick();
+			if (obj.getTimer() != null) {
+				obj.getTimer().tick();
 			}
 
 			// notifica um elemento
-			o.update(miliseconds, gameData);
+			obj.update(miliseconds, gameLevel);
 
 		}
 
-		if (gameData.getCurrentObject() != null) {
-			OBJ current = gameData.getCurrentObject();
+		// verifica se há um elemento com foco
+		if (gameLevel.getCurrentObject() != null) {
+			OBJ currObj = gameLevel.getCurrentObject();
 
-			boolean isJunctionOrStartShooting = (current.getTypeID() == OBJ.JUNCTION || current
-					.getTypeID() == OBJ.STARTPOINT) && current.isShooting();
+			// se o elemento está atirando
+			if (currObj.isShooting()) {
 
-			if (isJunctionOrStartShooting) {
-				// verifica se ele pode acertar algum outro objeto
-				current.getDirection();
+				// cria um projétil na frente do objeto e que
+				// se move na direção do objeto direção
+				XYPoint move = currObj.getDirection().toMoveIncrement();
+				int posX = currObj.getX() + move.x;
+				int posY = currObj.getY() + move.y;
+				OBJ bullet = OBJFactory.instance().createBullet(posX, posY,
+						currObj.getDirection());
+				gameLevel.objects().addElement(bullet);
 
-				// cria um projetil ficticio no lugar do objeto
-				XYPoint projetil = new XYPoint(current.getX(), current.getY());
-				XYPoint increment = directionToMovimentIncrement(current);
-				projetil.translate(increment);
+				// cria uma conexao entre o objeto e o projetil
+				OBJ connection = OBJFactory.instance().createConnection(
+						currObj, bullet);
+				gameLevel.objects().addElement(connection);
+				currObj.notifyConected();
 
-				// area do cenario
-				XYRect gameArea = new XYRect(0, 0, gameData.getWidth(),
-						gameData.getHeigth());
-
-				// navega pelo cenario até sair do cenario ou acertar alguém
-				boolean bHit = false;
-				OBJ oHit = null;
-				while (gameArea.contains(projetil)) {
-					for (Enumeration e = objects.elements(); e
-							.hasMoreElements();) {
-						OBJ o = (OBJ) e.nextElement();
-						if (o.getX() == projetil.x && o.getY() == projetil.y) {
-							bHit = true;
-							oHit = o;
-							break;
-						}
-					}
-					projetil.translate(increment);
-				}
-
-				// se acertou alguém que é junction
-				if (bHit && oHit.getTypeID() == OBJ.JUNCTION) {
-					// avisa que está conectado
-					current.notifyConect();
-
-					//
-					oHit.powerOn();
-
-					//
-					gameData.setCurrentObject(oHit);
-
-				} else // se acertou alguém que é endpoint
-				if (bHit && oHit.getTypeID() == OBJ.ENDPOINT) {
-					gameData.endGame();
-				} else {
-					gameData.endGame();
-				}
-
+				// agora nenhum elemento tem foco
+				gameLevel.setCurrentObject(null);
 			}
 		}
 
-	}
+		// process the current state for every element and apply game rules
+		for (Enumeration eachObject = objsInLevel.elements(); eachObject
+				.hasMoreElements();) {
+			OBJ object = (OBJ) eachObject.nextElement();
 
-	private XYPoint directionToMovimentIncrement(OBJ current) {
+			// if object is a bullet
+			if (object.getTypeID() == OBJType.BULLET) {
 
-		int x = 0;
-		int y = 0;
+				// verify if the bullet hits another object
+				boolean bHit = false;
+				OBJ oHit = null;
+				for (Enumeration eachOtherObject = objsInLevel.elements(); eachOtherObject
+						.hasMoreElements();) {
+					OBJ otherObj = (OBJ) eachOtherObject.nextElement();
 
-		switch (current.getDirection().value) {
+					// ignore hitting itself
+					if (otherObj == object)
+						continue;
 
-		case Direction.VALUE_DOWN_RIGHT:
-		case Direction.VALUE_RIGHT:
-		case Direction.VALUE_UP_RIGTH:
-			x = 1;
-			break;
-		case Direction.VALUE_DOWN_LEFT:
-		case Direction.VALUE_LEFT:
-		case Direction.VALUE_UP_LEFT:
-			x = -1;
-			break;
-		default:
-			x = 0;
-			break;
+					// if the two objects are in same position there is a hit
+					if (otherObj.getX() == object.getX()
+							&& otherObj.getY() == object.getY()) {
+						bHit = true;
+						oHit = otherObj;
+						break;
+					}
+				}
+
+				// if it hits a junction
+				if (bHit && oHit.getTypeID() == OBJType.JUNCTION) {
+
+					// search for the connection targeting this object
+					OBJ connection = null;
+					for (Enumeration eachOtherObject = objsInLevel.elements(); eachOtherObject
+							.hasMoreElements();) {
+						OBJ other = (OBJ) eachObject.nextElement();
+						if (other.getTypeID() == OBJType.CONNECTION
+								&& other.getConnectionTargetObject() == object) {
+							connection = other;
+							break;
+						}
+
+					}
+
+					// if a connection was found
+					if (connection != null) {
+						// it will target the hit object
+						connection.setConnectionTargetObject(oHit);
+					}
+
+					oHit.powerOn();
+					gameLevel.setCurrentObject(oHit);
+					objsToBeDeleted.addElement(object);
+					continue;
+
+				} else // if it hits an endpoint
+				if (bHit && oHit.getTypeID() == OBJType.ENDPOINT) {
+					gameLevel.endGame();
+					continue;
+				}
+
+				// verify if the bullet leaves the level
+				if (!gameLevel.getGameArea().contains(object.getX(),
+						object.getY())) {
+					objsToBeDeleted.addElement(object);
+					continue;
+				}
+
+			}
+
+		} // end - process the current state for every element and apply game
+			// rules
+
+		// remove do jogo todos elementos que foram marcados para exclusao
+		for (Enumeration eToBeDeleted = objsToBeDeleted.elements(); eToBeDeleted
+				.hasMoreElements();) {
+			gameLevel.objects().removeElement((OBJ) eToBeDeleted.nextElement());
 		}
-		switch (current.getDirection().value) {
-		case Direction.VALUE_DOWN_RIGHT:
-		case Direction.VALUE_DOWN:
-		case Direction.VALUE_DOWN_LEFT:
-			y = 1;
-			break;
-		case Direction.VALUE_UP_LEFT:
-		case Direction.VALUE_UP:
-		case Direction.VALUE_UP_RIGTH:
-			y = -1;
-			break;
-		default:
-			y = 0;
-			break;
-		}
-
-		return new XYPoint(x, y);
 	}
 }

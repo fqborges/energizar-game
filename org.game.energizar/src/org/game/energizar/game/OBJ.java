@@ -1,17 +1,13 @@
 package org.game.energizar.game;
 
+import org.game.energizar.sprites.Sprite;
+
 import net.rim.device.api.system.Bitmap;
-import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.XYRect;
 
 // OBJ is our root class for all objects, it defines behaviors and properties
 // that are the same for all objects, whether its the hero, enemies, or photons
 public class OBJ {
-
-	// tipos de objeto estáticos
-	public final static char ENDPOINT = 'e';
-	public final static char STARTPOINT = 's';
-	public final static char JUNCTION = 'j';
 
 	// todo objeto tem um id do tipo
 	private char _typeID;
@@ -48,24 +44,14 @@ public class OBJ {
 	}
 
 	// FEATURE Sprite
-	private Bitmap _bitmap = null; // bitmap que representa o objeto
-	private XYRect _spriteRect = null;
+	private Sprite _sprite;
 
-	public Bitmap getSpriteBitmap() {
-		return _bitmap;
+	public Sprite getSprite() {
+		return _sprite;
 	}
 
-	public void setSpriteBitmap(Bitmap bitmap) {
-		this._bitmap = bitmap;
-		this.setSpriteRect(0, 0, _bitmap.getWidth(), _bitmap.getHeight());
-	}
-
-	public XYRect getSpriteRect() {
-		return new XYRect(_spriteRect);
-	}
-
-	public void setSpriteRect(int x, int y, int width, int heigth) {
-		this._spriteRect = new XYRect(x, y, width, heigth);
+	public void setSprite(Sprite sprite) {
+		this._sprite = sprite;
 	}
 
 	// FEATURE Direção
@@ -138,50 +124,29 @@ public class OBJ {
 		this.setJunctionState(ON);
 	};
 
-	public void notifyConect() {
+	public void notifyConected() {
 		this.setJunctionState(CONNECTED);
 	};
 
-	// A quick method simply to ensure screen bound objects don't go off screen.
-	// For now this is just our hero, but there may be other objects that
-	// function
-	// like this.
-	public void boundToScreen() {
-		// If the coordinates are off screen in any direction, correct the
-		// coordinate and
-		// set that velocity to 0
-		if (_posX < 0) {
-			_posX = 0;
-		}
+	// Feature Connection
+	private OBJ _connectionSourceObj;
 
-		if (_posY < 0) {
-			_posY = 0;
-		}
-
-		if (_posX > Display.getWidth() - _bitmap.getWidth()) {
-			_posX = Display.getWidth() - _bitmap.getWidth();
-		}
-
-		if (_posY > Display.getHeight() - _bitmap.getHeight()) {
-			_posY = Display.getHeight() - _bitmap.getHeight();
-		}
-
+	public void setConnectionSourceObject(OBJ sourceObj) {
+		this._connectionSourceObj = sourceObj;
 	}
 
-	public void moveUp() {
-		this._posY -= 1;
+	public OBJ getConnectionSourceObject() {
+		return _connectionSourceObj;
 	}
 
-	public void moveDown() {
-		this._posY += 1;
+	private OBJ _connectionTargetObj;
+
+	public void setConnectionTargetObject(OBJ targetOBj) {
+		this._connectionTargetObj = targetOBj;
 	}
 
-	public void moveLeft() {
-		this._posX -= 1;
-	}
-
-	public void moveRight() {
-		this._posX += 1;
+	public OBJ getConnectionTargetObject() {
+		return _connectionTargetObj;
 	}
 
 	// // Collision detection routine using an AABB test (Axis Align Bounding

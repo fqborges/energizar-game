@@ -2,6 +2,8 @@ package org.game.energizar.game;
 
 import java.util.Vector;
 
+import net.rim.device.api.ui.XYRect;
+
 import org.game.energizar.util.StringUtil;
 
 public class GameLevel {
@@ -81,7 +83,7 @@ public class GameLevel {
 				}
 				if (obj != null) {
 					this.objects().addElement(obj);
-					if (obj.getTypeID() == OBJ.STARTPOINT) {
+					if (obj.getTypeID() == OBJType.STARTPOINT) {
 						this.setCurrentObject(obj);
 					}
 				}
@@ -140,6 +142,10 @@ public class GameLevel {
 
 	public int getHeigth() {
 		return _height;
+	}
+
+	public XYRect getGameArea() {
+		return new XYRect(0, 0, this._width, this._height);
 	}
 
 	public OBJ getCurrentObject() {

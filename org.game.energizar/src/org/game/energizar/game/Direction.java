@@ -1,5 +1,7 @@
 package org.game.energizar.game;
 
+import net.rim.device.api.ui.XYPoint;
+
 /**
  * Direction é uma classe que representa uma direção possível entre up ,right,
  * down, left e seus quatro intermediários. Note que direção é um classe
@@ -102,6 +104,46 @@ public class Direction {
 			throw new java.lang.IllegalStateException(
 					"A direção não é uma dentre as possíveis. Ver classe Direction.");
 		}
+	}
+
+	public XYPoint toMoveIncrement() {
+
+		int x = 0;
+		int y = 0;
+
+		switch (value) {
+
+		case Direction.VALUE_DOWN_RIGHT:
+		case Direction.VALUE_RIGHT:
+		case Direction.VALUE_UP_RIGTH:
+			x = 1;
+			break;
+		case Direction.VALUE_DOWN_LEFT:
+		case Direction.VALUE_LEFT:
+		case Direction.VALUE_UP_LEFT:
+			x = -1;
+			break;
+		default:
+			x = 0;
+			break;
+		}
+		switch (value) {
+		case Direction.VALUE_DOWN_RIGHT:
+		case Direction.VALUE_DOWN:
+		case Direction.VALUE_DOWN_LEFT:
+			y = 1;
+			break;
+		case Direction.VALUE_UP_LEFT:
+		case Direction.VALUE_UP:
+		case Direction.VALUE_UP_RIGTH:
+			y = -1;
+			break;
+		default:
+			y = 0;
+			break;
+		}
+
+		return new XYPoint(x, y);
 	}
 
 }

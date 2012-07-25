@@ -3,7 +3,7 @@ package org.game.energizar.modules;
 import java.util.Vector;
 
 import net.rim.device.api.system.Bitmap;
-import net.rim.device.api.system.Display;
+import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.FontFamily;
 import net.rim.device.api.ui.Graphics;
@@ -81,6 +81,9 @@ public class GFX {
 		// _backgroundBM, 0, 0);
 		// }
 
+		// seta a cor de fundo como preta
+		g.setColor(Color.BLACK);
+
 		// Tamanho da área de desenho
 		int canvasWidth = g.getClippingRect().width;
 		int canvasHeigth = g.getClippingRect().height;
@@ -101,12 +104,8 @@ public class GFX {
 		int yOffset = (canvasHeigth - (blockHeight * gameData.getHeigth())) / 2;
 
 		// desenha as bordas do level
-		g.drawRect(xOffset, yOffset, blockWidth * gameData.getWidth(),
+		g.fillRect(xOffset, yOffset, blockWidth * gameData.getWidth(),
 				blockHeight * gameData.getHeigth());
-
-		// cria um bitmap para ser a área de desenho
-		// Bitmap layer = new Bitmap(canvasWidth, canvasHeigth);
-		// layer.createAlpha();
 
 		// cria um bitmap para ser o buffer dos blocos
 		Bitmap block = new Bitmap(blockWidth, blockHeight);
@@ -115,29 +114,25 @@ public class GFX {
 		// Desenha todos objetos na tela
 		Vector objects = gameData.objects();
 		for (int lcv = 0; lcv < objects.size(); lcv++) {
-
 			OBJ obj = (OBJ) objects.elementAt(lcv);
+
 			Bitmap spriteBitmap = obj.getSpriteBitmap();
+
+			// se o objeto não tem um sprite não desenha ele
+			if (spriteBitmap == null) {
+				continue;
+			}
+
 			XYRect spriteRect = obj.getSpriteRect();
 
 			spriteBitmap.scaleInto(spriteRect.x, spriteRect.y,
 					spriteRect.width, spriteRect.height, block, 0, 0,
 					blockWidth, blockHeight, Bitmap.FILTER_BILINEAR);
 
-			// block.scaleInto(layer, Bitmap.FILTER_BILINEAR);
-
-			// obj.getSpriteBitmap().scaleInto(0, 0, blockWidth, blockHeight,
-			// layer, xOffset + obj.getX() * blockWidth,
-			// yOffset + obj.getY() * blockHeight, blockWidth,
-			// blockHeight, Bitmap.FILTER_BILINEAR);
-
 			g.drawBitmap(xOffset + obj.getX() * blockWidth,
 					yOffset + obj.getY() * blockHeight, block.getWidth(),
 					block.getHeight(), block, 0, 0);
 		}
-
-		// desenha o buffer na tela
-		// g.drawBitmap(0, 0, layer.getWidth(), layer.getHeight(), layer, 0, 0);
 
 		// // Draw score
 		// String zeroPad;

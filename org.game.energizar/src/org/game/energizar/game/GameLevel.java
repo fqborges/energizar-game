@@ -4,7 +4,6 @@ import java.util.Vector;
 
 import org.game.energizar.util.StringUtil;
 
-
 public class GameLevel {
 
 	Vector _objects;
@@ -13,6 +12,7 @@ public class GameLevel {
 	private String _errorMessage;
 	private int _height;
 	private int _width;
+	private OBJ _currentObject = null;
 
 	// cria um level do jogo
 	public GameLevel() {
@@ -67,13 +67,23 @@ public class GameLevel {
 				int posX = j;
 				int posY = i;
 
+				OBJ obj = null;
 				switch (c) {
 				case '*':
-				case '>':
-				case '<':
-					OBJ obj = OBJFactory.instance().createJunction(posX, posY);
-					this.objects().addElement(obj);
+					obj = OBJFactory.instance().createJunction(posX, posY);
 					break;
+				case '>':
+					obj = OBJFactory.instance().createStartPoint(posX, posY);
+					break;
+				case '<':
+					obj = OBJFactory.instance().createEndPoint(posX, posY);
+					break;
+				}
+				if (obj != null) {
+					this.objects().addElement(obj);
+					if (obj.getTypeID() == OBJ.STARTPOINT) {
+						this.setCurrentObject(obj);
+					}
 				}
 			}
 		}
@@ -130,6 +140,26 @@ public class GameLevel {
 
 	public int getHeigth() {
 		return _height;
+	}
+
+	public OBJ getCurrentObject() {
+		return _currentObject;
+	}
+
+	public void setCurrentObject(OBJ currentObject) {
+		this._currentObject = currentObject;
+	}
+
+	public void endGame() {
+		this._isActive = false;
+	}
+
+	public String getErrorMessage() {
+		return _errorMessage;
+	}
+
+	public boolean getError() {
+		return this._hasError;
 	}
 
 }

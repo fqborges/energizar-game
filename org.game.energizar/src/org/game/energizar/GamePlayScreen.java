@@ -1,8 +1,9 @@
 package org.game.energizar;
 
+import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.Graphics;
-import net.rim.device.api.ui.Keypad;
 import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.container.FullScreen;
 
 import org.game.energizar.game.GameLevel;
@@ -47,6 +48,8 @@ public class GamePlayScreen extends FullScreen {
 	// update the background,
 	// update score, check for end of game, etc. This is the main heartbeat.
 	private class GamePlayLoop extends Thread {
+		private static final int MILISECONDS_PER_TICK = 50;
+
 		// When the object is created it starts itself as a thread
 		GamePlayLoop() {
 			start();
@@ -58,10 +61,10 @@ public class GamePlayScreen extends FullScreen {
 			while (_gameLevel.isGameActive()) {
 
 				// processa as interações do usuário.
-				INPUT.instance().process(_gameLevel);
+				INPUT.instance().process(_gameLevel, MILISECONDS_PER_TICK);
 
 				// aplica as regras do jogo
-				GameLogic.instance().process(_gameLevel);
+				GameLogic.instance().process(_gameLevel, MILISECONDS_PER_TICK);
 
 				// causa o redesenho da tela.
 				// gera uma execução do método paint
@@ -70,7 +73,7 @@ public class GamePlayScreen extends FullScreen {
 
 				try {
 					// Attempt to sleep for 50 ms
-					Thread.sleep(50);
+					Thread.sleep(MILISECONDS_PER_TICK);
 
 				} catch (InterruptedException e) {
 					// Do nothing if we couldn't sleep, we don't care about
@@ -83,7 +86,11 @@ public class GamePlayScreen extends FullScreen {
 				public void run() {
 					UiApplication.getUiApplication().popScreen(
 							GamePlayScreen.this);
-					;
+					if (_gameLevel.getError()) {
+						Dialog.alert(_gameLevel.getErrorMessage());
+					} else {
+						Dialog.alert("Game Over");
+					}
 				}
 			});
 		}
@@ -102,8 +109,16 @@ public class GamePlayScreen extends FullScreen {
 		return INPUT.instance().receiveKeyChar(key, status, time);
 
 	}
-	
-	Keypad s;
+
+	// The keyChar method is called by the event handler when a key is pressed.
+	protected boolean keyDown(int keycode, int time) {
+		return INPUT.instance().receiveKeyDown(keycode, time);
+	}
+
+	// The keyChar method is called by the event handler when a key is pressed.
+	protected boolean keyUp(int keycode, int time) {
+		return INPUT.instance().receiveKeyUp(keycode, time);
+	}
 
 	// The navigationMovement method is called by the event handler when the
 	// trackball is used.

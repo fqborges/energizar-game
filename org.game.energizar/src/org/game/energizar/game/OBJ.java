@@ -8,8 +8,31 @@ import net.rim.device.api.ui.XYRect;
 // that are the same for all objects, whether its the hero, enemies, or photons
 public class OBJ {
 
+	// tipos de objeto estáticos
+	public final static char ENDPOINT = 'e';
+	public final static char STARTPOINT = 's';
+	public final static char JUNCTION = 'j';
+
+	// todo objeto tem um id do tipo
+	private char _typeID;
+
+	/**
+	 * Cria um objeto com o tipo informado.
+	 */
+	OBJ(char typeID) {
+		this._typeID = typeID;
+	}
+
+	public long getTypeID() {
+		return _typeID;
+	}
+
+	// FEATURE update
+	public void update(long gameTime, GameLevel gameData) {
+	}
+
 	// FEATURE posição
-	int _posX = -1, _posY = -1; // posição
+	private int _posX = -1, _posY = -1; // posição
 
 	public int getX() {
 		return _posX;
@@ -25,7 +48,8 @@ public class OBJ {
 	}
 
 	// FEATURE Sprite
-	Bitmap _bitmap = null; // bitmap que representa o objeto
+	private Bitmap _bitmap = null; // bitmap que representa o objeto
+	private XYRect _spriteRect = null;
 
 	public Bitmap getSpriteBitmap() {
 		return _bitmap;
@@ -33,10 +57,15 @@ public class OBJ {
 
 	public void setSpriteBitmap(Bitmap bitmap) {
 		this._bitmap = bitmap;
+		this.setSpriteRect(0, 0, _bitmap.getWidth(), _bitmap.getHeight());
 	}
 
 	public XYRect getSpriteRect() {
-		return new XYRect(0, 0, _bitmap.getWidth(), _bitmap.getHeight());
+		return new XYRect(_spriteRect);
+	}
+
+	public void setSpriteRect(int x, int y, int width, int heigth) {
+		this._spriteRect = new XYRect(x, y, width, heigth);
 	}
 
 	// FEATURE Direção
@@ -53,7 +82,7 @@ public class OBJ {
 	// FEATURE Timer
 	private Timer _timer;
 
-	Timer getTimer() {
+	public Timer getTimer() {
 		return _timer;
 	}
 
@@ -61,11 +90,57 @@ public class OBJ {
 		this._timer = _timer;
 	}
 
-	/**
-	 * Cria um objeto como a posição x, y e bitmap bitmap.
-	 */
-	OBJ() {
+	// FEATURE shooter
+	protected final static int SHOOTING = 0;
+	protected final static int IDLE = 1;
+	private int _shootingState = IDLE;
+
+	public void shoot() {
+		this._shootingState = SHOOTING;
 	}
+
+	public boolean isShooting() {
+		return (this._shootingState == SHOOTING);
+	}
+
+	public void notifyShotHandled() {
+		this._shootingState = IDLE;
+	}
+
+	// FEATURE junction
+	protected final static int OFF = 0;
+	protected final static int ON = 1;
+	protected final static int CONNECTED = 2;
+
+	private int _junctionState = OFF;
+	private boolean _junctionStateChanged = false;
+
+	private void setJunctionState(int state) {
+		if (this._junctionState != state) {
+			this._junctionState = state;
+			_junctionStateChanged = true;
+		}
+	}
+
+	public int getJunctionState() {
+		return _junctionState;
+	}
+
+	public boolean isJunctionStateChanged() {
+		return _junctionStateChanged;
+	}
+
+	public void clearJunctionStateChanged() {
+		this._junctionStateChanged = false;
+	}
+
+	public void powerOn() {
+		this.setJunctionState(ON);
+	};
+
+	public void notifyConect() {
+		this.setJunctionState(CONNECTED);
+	};
 
 	// A quick method simply to ensure screen bound objects don't go off screen.
 	// For now this is just our hero, but there may be other objects that

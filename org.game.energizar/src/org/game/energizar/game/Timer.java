@@ -4,6 +4,7 @@ public class Timer {
 
 	private final int ticks;
 	private int count;
+	private boolean disabled;
 
 	private final Runnable event;
 
@@ -11,18 +12,27 @@ public class Timer {
 		this.ticks = timeInTicks;
 		this.count = 0;
 		this.event = event;
+		this.disabled = false;
 	}
 
 	public void tick() {
-		this.count++;
-		if (this.count > ticks) {
-			if (this.event != null) {
-				this.event.run();
+		if (this.disabled) {
+			return;
+		} else {
+			this.count++;
+			if (this.count > ticks) {
+				if (this.event != null) {
+					this.event.run();
+				}
 			}
 		}
 	}
 
 	public void reset() {
 		this.count = 0;
+	}
+
+	public void disable() {
+		this.disabled = true;
 	}
 }

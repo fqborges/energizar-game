@@ -51,8 +51,8 @@ public class GameLogic {
 				// cria um projétil na frente do objeto e que
 				// se move na direção do objeto direção
 				XYPoint move = currObj.getDirection().toMoveIncrement();
-				int posX = currObj.getX() + move.x;
-				int posY = currObj.getY() + move.y;
+				int posX = currObj.getPos().x + move.x;
+				int posY = currObj.getPos().y + move.y;
 				OBJ bullet = OBJFactory.instance().createBullet(posX, posY,
 						currObj.getDirection());
 				gameLevel.objects().addElement(bullet);
@@ -61,7 +61,10 @@ public class GameLogic {
 				OBJ connection = OBJFactory.instance().createConnection(
 						currObj, bullet);
 				gameLevel.objects().addElement(connection);
+
+				//
 				currObj.notifyConected();
+				currObj.notifyShotHandled();
 
 				// agora nenhum elemento tem foco
 				gameLevel.setCurrentObject(null);
@@ -87,9 +90,13 @@ public class GameLogic {
 					if (otherObj == object)
 						continue;
 
+					// cant hit objetcts without a position
+					if (otherObj.getPos() == null) {
+						continue;
+					}
+
 					// if the two objects are in same position there is a hit
-					if (otherObj.getX() == object.getX()
-							&& otherObj.getY() == object.getY()) {
+					if (otherObj.getPos().equals(object.getPos())) {
 						bHit = true;
 						oHit = otherObj;
 						break;
@@ -130,8 +137,7 @@ public class GameLogic {
 				}
 
 				// verify if the bullet leaves the level
-				if (!gameLevel.getGameArea().contains(object.getX(),
-						object.getY())) {
+				if (!gameLevel.getGameArea().contains(object.getPos())) {
 					objsToBeDeleted.addElement(object);
 					continue;
 				}

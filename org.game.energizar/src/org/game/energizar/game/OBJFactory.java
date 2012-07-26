@@ -3,6 +3,8 @@ package org.game.energizar.game;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.XYPoint;
 
+import org.game.energizar.game.datatypes.Direction;
+import org.game.energizar.game.datatypes.Path;
 import org.game.energizar.sprites.Sprite;
 
 public class OBJFactory {
@@ -123,8 +125,7 @@ public class OBJFactory {
 		obj.setTimer(new Timer(5, new Runnable() {
 			public void run() {
 				XYPoint move = obj.getDirection().toMoveIncrement();
-
-				obj.setPos(obj.getX() + move.x, obj.getY() + move.y);
+				obj.setPos(obj.getPos().x + move.x, obj.getPos().y + move.y);
 			}
 		}));
 		return obj;
@@ -135,25 +136,50 @@ public class OBJFactory {
 		final OBJ obj = new OBJ(OBJType.CONNECTION) {
 			public void update(long gameTime, GameLevel gameData) {
 				OBJ source = this.getConnectionSourceObject();
-				if (source != null) {
-					this.setPos(source.getX(), source.getY());
-				}
-				OBJ target = this.getConnectionTargetObject();
-				if (target != null) {
-					this.setPos(target.getX(), target.getY());
+				if (source != null && source.getPos() != null) {
+					if (!source.getPos().equals(this.getPath().getFirst())) {
+						this.getPath().addToBegining(source.getPos());
+					}
 				}
 
-				if (source == target) {
-					this.setSprite(ArtResource.instance().getSprite(2, 2));
+				OBJ target = this.getConnectionTargetObject();
+				if (target != null && target.getPos() != null) {
+					if (!target.getPos().equals(this.getPath().getLast())) {
+						this.getPath().addToEnd(target.getPos());
+					}
 				}
 
 			}
 		};
+		Sprite sprite = null;
+		XYPoint srcPos = sourceObj.getPos();
+		XYPoint tgtPos = targetObj.getPos();
+		if (srcPos.equals(tgtPos)) {
+			// ponto
+			sprite = ArtResource.instance().getSprite(2, 2);
+		} else if (srcPos.x == tgtPos.x) {
+			// em pe
+			sprite = ArtResource.instance().getSprite(3, 0);
+		} else if (srcPos.y == tgtPos.y) {
+			// deitado
+			sprite = ArtResource.instance().getSprite(3, 1);
+		} else {
+			int coeficienteAngular = (tgtPos.y - srcPos.y)
+					/ (tgtPos.x - srcPos.x);
+			if (coeficienteAngular > 0) {
+				// ascendente
+				sprite = ArtResource.instance().getSprite(3, 2);
+			} else { // coeficienteAngular < 0
+				// descendente
+				sprite = ArtResource.instance().getSprite(3, 3);
+			}
+		}
 
-		Sprite sprite = ArtResource.instance().getSprite(2, 2);
 		obj.setSprite(sprite);
+
 		obj.setConnectionSourceObject(sourceObj);
 		obj.setConnectionTargetObject(targetObj);
+		obj.setPath(new Path(srcPos, tgtPos));
 
 		return obj;
 	}

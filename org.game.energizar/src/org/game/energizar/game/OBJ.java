@@ -1,9 +1,13 @@
 package org.game.energizar.game;
 
+import net.rim.device.api.ui.XYPoint;
+
+import org.game.energizar.game.datatypes.Direction;
+import org.game.energizar.game.datatypes.Path;
 import org.game.energizar.sprites.Sprite;
 
 // OBJ is our root class for all objects, it defines behaviors and properties
-// that are the same for all objects, whether its the hero, enemies, or photons
+// that are the same for ll objects, whether its the hero, enemies, or photons
 public class OBJ {
 
 	// todo objeto tem um id do tipo
@@ -24,20 +28,30 @@ public class OBJ {
 	public void update(long gameTime, GameLevel gameData) {
 	}
 
-	// FEATURE posição
-	private int _posX = -1, _posY = -1; // posição
+	// FEATURE Position
+	private XYPoint _position; // posição
 
-	public int getX() {
-		return _posX;
+	public XYPoint getPos() {
+		return _position;
 	}
 
-	public int getY() {
-		return _posY;
+	public void setPos(XYPoint pos) {
+		this._position = pos;
 	}
 
 	public void setPos(int x, int y) {
-		this._posX = x;
-		this._posY = y;
+		this.setPos(new XYPoint(x, y));
+	}
+
+	// FEATURE Path
+	private Path _path;
+
+	public void setPath(Path path) {
+		this._path = path;
+	}
+
+	public Path getPath() {
+		return this._path;
 	}
 
 	// FEATURE Sprite
@@ -145,6 +159,8 @@ public class OBJ {
 	public OBJ getConnectionTargetObject() {
 		return _connectionTargetObj;
 	}
+
+	// Feature path
 
 	// // Collision detection routine using an AABB test (Axis Align Bounding
 	// Box).

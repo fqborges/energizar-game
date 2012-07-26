@@ -1,4 +1,4 @@
-package org.game.energizar.game;
+package org.game.energizar.game.datatypes;
 
 import net.rim.device.api.ui.XYPoint;
 

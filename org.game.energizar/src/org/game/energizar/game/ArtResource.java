@@ -18,6 +18,8 @@ public class ArtResource {
 	}
 
 	public Bitmap get() {
+
+		int asdfg;
 		return _bitmap;
 	}
 }

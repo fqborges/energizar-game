@@ -2,9 +2,6 @@ package org.game.energizar.game;
 
 import org.game.energizar.sprites.Sprite;
 
-import net.rim.device.api.system.Bitmap;
-import net.rim.device.api.ui.XYRect;
-
 // OBJ is our root class for all objects, it defines behaviors and properties
 // that are the same for all objects, whether its the hero, enemies, or photons
 public class OBJ {

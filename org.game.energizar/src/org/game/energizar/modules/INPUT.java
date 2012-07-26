@@ -4,6 +4,7 @@ import net.rim.device.api.ui.Keypad;
 
 import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.OBJ;
+import org.game.energizar.game.OBJType;
 
 public class INPUT {
 
@@ -56,11 +57,13 @@ public class INPUT {
 		if (charsJustDown[Keypad.KEY_SPACE]) {
 			OBJ o = gameData.getCurrentObject();
 
-			if (o.getTypeID() == OBJ.JUNCTION) {
-				o.shoot();
-			}
-			if (o.getTypeID() == OBJ.STARTPOINT) {
-				o.shoot();
+			if (o != null) {
+				if (o.getTypeID() == OBJType.JUNCTION) {
+					o.shoot();
+				}
+				if (o.getTypeID() == OBJType.STARTPOINT) {
+					o.shoot();
+				}
 			}
 		}
 

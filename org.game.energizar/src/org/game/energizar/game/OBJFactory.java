@@ -1,9 +1,9 @@
 package org.game.energizar.game;
 
-import org.game.energizar.sprites.Sprite;
-
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.XYPoint;
+
+import org.game.energizar.sprites.Sprite;
 
 public class OBJFactory {
 
@@ -19,8 +19,66 @@ public class OBJFactory {
 	private OBJFactory() {
 	}
 
+	// cria um objeto do tipo 'junction'
 	public OBJ createJunction(int x, int y) {
-		return new JunctionFactory().createJunction(x, y);
+
+		final OBJ obj = new OBJ(OBJType.JUNCTION) {
+			public void update(long gameTime, GameLevel gameData) {
+
+				// update sprite
+				int row = this.getJunctionState() == OBJ.OFF ? 0 : 1;
+				int col = 0;
+				Direction direction = Direction.Up;
+				do {
+					if (this.getDirection().equals(direction))
+						break;
+					col++;
+					direction = direction.RotateCCW();
+				} while (direction != Direction.Up);
+
+				this.getSprite().setRect(col * 64, row * 64, 64, 64);
+
+				// verify if state changed
+				if (this.isJunctionStateChanged()) {
+					this.clearJunctionStateChanged();
+
+					switch (this.getJunctionState()) {
+					case OBJ.ON:
+						final OBJ thisRef = this;
+						Timer timer = new Timer(20, new Runnable() {
+							public void run() {
+								if (thisRef.getJunctionState() != OBJ.ON) {
+									return;
+								}
+								thisRef.setDirection(thisRef.getDirection()
+										.RotateCW());
+								thisRef.getTimer().reset();
+							}
+						});
+						this.setTimer(timer);
+						break;
+					case OBJ.CONNECTED:
+					case OBJ.OFF:
+						if (this.getTimer() != null) {
+							this.getTimer().disable();
+							this.setTimer(null);
+						}
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		};
+
+		obj.setPos(x, y);
+		obj.setDirection(Direction.Left);
+		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
+				0 * 64, 0 * 64, 64, 64);
+
+		obj.setSprite(sprite);
+
+		return obj;
 	}
 
 	public OBJ createStartPoint(int x, int y) {
@@ -76,107 +134,31 @@ public class OBJFactory {
 
 	public OBJ createConnection(OBJ sourceObj, OBJ targetObj) {
 
-		final OBJ obj = new OBJ(OBJType.CONNECTION);
+		final OBJ obj = new OBJ(OBJType.CONNECTION) {
+			public void update(long gameTime, GameLevel gameData) {
+				OBJ source = this.getConnectionSourceObject();
+				if (source != null) {
+					this.setPos(source.getX(), source.getY());
+				}
+				OBJ target = this.getConnectionTargetObject();
+				if (target != null) {
+					this.setPos(target.getX(), target.getY());
+				}
 
+				if (source == target) {
+					this.getSprite().setRect(2 * 64, 2 * 64, 64, 64);
+				}
+
+			}
+		};
+
+		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
+				2 * 64, 2 * 64, 64, 64);
+
+		obj.setSprite(sprite);
 		obj.setConnectionSourceObject(sourceObj);
 		obj.setConnectionTargetObject(targetObj);
 
 		return obj;
-	}
-
-	/**
-	 * classe que é responsável por criar uma objeto do tipo junction.
-	 */
-	private class JunctionFactory {
-
-		// cria um objeto do tipo 'junction'
-		public OBJ createJunction(int x, int y) {
-
-			final OBJ obj = new OBJ(OBJType.JUNCTION) {
-				public void update(long gameTime, GameLevel gameData) {
-					if (this.isJunctionStateChanged()) {
-						this.clearJunctionStateChanged();
-
-						switch (this.getJunctionState()) {
-						case OBJ.ON:
-							setJunctionSpryteForDirection(this);
-							Timer timer = createJunctionTimer(this);
-							this.setTimer(timer);
-							break;
-						case OBJ.CONNECTED:
-						case OBJ.OFF:
-							if (this.getTimer() != null) {
-								this.getTimer().disable();
-								this.setTimer(null);
-							}
-							break;
-						default:
-							break;
-						}
-					}
-				}
-			};
-
-			obj.setPos(x, y);
-			obj.setDirection(Direction.Left);
-
-			// sprite apagado olhando para esquerda
-			int row = 0;
-			int col = 2;
-			Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-					col * 64, row * 64, 64, 64);
-			obj.setSprite(sprite);
-
-			return obj;
-		}
-
-		private Timer createJunctionTimer(final OBJ obj) {
-			Timer timer = new Timer(10, new Runnable() {
-				public void run() {
-					if (obj.getJunctionState() != OBJ.ON) {
-						return;
-					}
-
-					obj.setDirection(obj.getDirection().RotateCW());
-					setJunctionSpryteForDirection(obj);
-					obj.getTimer().reset();
-				}
-			});
-			return timer;
-		}
-
-		private void setJunctionSpryteForDirection(final OBJ obj) {
-			int row = 1;
-			int col = 0;
-			switch (obj.getDirection().value) {
-			case Direction.VALUE_UP:
-				col = 0;
-				break;
-			case Direction.VALUE_UP_LEFT:
-				col = 1;
-				break;
-			case Direction.VALUE_LEFT:
-				col = 2;
-				break;
-			case Direction.VALUE_DOWN_LEFT:
-				col = 3;
-				break;
-			case Direction.VALUE_DOWN:
-				col = 4;
-				break;
-			case Direction.VALUE_DOWN_RIGHT:
-				col = 5;
-				break;
-			case Direction.VALUE_RIGHT:
-				col = 6;
-				break;
-			case Direction.VALUE_UP_RIGTH:
-				col = 7;
-				break;
-			default:
-				break;
-			}
-			obj.getSprite().setSpriteRect(col * 64, row * 64, 64, 64);
-		}
 	}
 }

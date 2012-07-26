@@ -64,20 +64,20 @@ public class GFX {
 			// se o objeto não tem um sprite não desenha ele
 			if (obj.getSprite() == null) {
 				continue;
+			} else {
+				// Bitmap spriteBitmap = obj.getSprite().getBitmap();
+				// XYRect spriteRect = obj.getSprite().getRect();
+
+				obj.getSprite().drawToBuffer(block, 0, 0, blockWidth,
+						blockHeight, Bitmap.FILTER_BOX);
+				g.drawBitmap(xOffset + obj.getX() * blockWidth,
+						yOffset + obj.getY() * blockHeight, blockWidth,
+						blockHeight, block, 0, 0);
 			}
-			Bitmap spriteBitmap = obj.getSprite().getBitmap();
-			XYRect spriteRect = obj.getSprite().getRect();
-
-			obj.getSprite().drawToBuffer(block, 0, 0, blockWidth, blockHeight,
-					Bitmap.FILTER_BOX);
-
 			// spriteBitmap.scaleInto(spriteRect.x, spriteRect.y,
 			// spriteRect.width, spriteRect.height, block, 0, 0,
 			// blockWidth, blockHeight, Bitmap.FILTER_BILINEAR);
 
-			g.drawBitmap(xOffset + obj.getX() * blockWidth,
-					yOffset + obj.getY() * blockHeight, blockWidth,
-					blockHeight, block, 0, 0);
 		}
 
 	}

@@ -22,7 +22,7 @@ public class Sprite {
 		return _bitmap;
 	}
 
-	public void setBitmap(Bitmap bitmap) {
+	private void setBitmap(Bitmap bitmap) {
 		this._bitmap = bitmap;
 		this.setRect(0, 0, _bitmap.getWidth(), _bitmap.getHeight());
 	}
@@ -31,7 +31,7 @@ public class Sprite {
 		return new XYRect(_spriteRect);
 	}
 
-	public void setRect(int x, int y, int width, int height) {
+	private void setRect(int x, int y, int width, int height) {
 		this._spriteRect = new XYRect(x, y, width, height);
 	}
 

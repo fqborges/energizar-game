@@ -4,7 +4,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import net.rim.device.api.ui.XYPoint;
-import net.rim.device.api.ui.XYRect;
 
 public class GameLogic {
 

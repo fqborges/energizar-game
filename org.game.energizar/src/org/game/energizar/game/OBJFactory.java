@@ -36,7 +36,7 @@ public class OBJFactory {
 					direction = direction.RotateCCW();
 				} while (direction != Direction.Up);
 
-				this.getSprite().setRect(col * 64, row * 64, 64, 64);
+				this.setSprite(ArtResource.instance().getSprite(row, col));
 
 				// verify if state changed
 				if (this.isJunctionStateChanged()) {
@@ -74,7 +74,8 @@ public class OBJFactory {
 		obj.setPos(x, y);
 		obj.setDirection(Direction.Left);
 		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-				0 * 64, 0 * 64, 64, 64);
+				0 * ArtResource.SPRITE_SIZE, 0 * ArtResource.SPRITE_SIZE,
+				ArtResource.SPRITE_SIZE, ArtResource.SPRITE_SIZE);
 
 		obj.setSprite(sprite);
 
@@ -89,8 +90,7 @@ public class OBJFactory {
 
 		int row = 2;
 		int col = 7;
-		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-				col * 64, row * 64, 64, 64);
+		Sprite sprite = ArtResource.instance().getSprite(row, col);
 		obj.setSprite(sprite);
 
 		return obj;
@@ -103,8 +103,7 @@ public class OBJFactory {
 
 		int row = 2;
 		int col = 0;
-		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-				col * 64, row * 64, 64, 64);
+		Sprite sprite = ArtResource.instance().getSprite(row, col);
 		obj.setSprite(sprite);
 
 		return obj;
@@ -118,8 +117,7 @@ public class OBJFactory {
 
 		int row = 2;
 		int col = 2;
-		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-				col * 64, row * 64, 64, 64);
+		Sprite sprite = ArtResource.instance().getSprite(row, col);
 		obj.setSprite(sprite);
 
 		obj.setTimer(new Timer(5, new Runnable() {
@@ -146,15 +144,13 @@ public class OBJFactory {
 				}
 
 				if (source == target) {
-					this.getSprite().setRect(2 * 64, 2 * 64, 64, 64);
+					this.setSprite(ArtResource.instance().getSprite(2, 2));
 				}
 
 			}
 		};
 
-		Sprite sprite = new Sprite(Bitmap.getBitmapResource("gameart.png"),
-				2 * 64, 2 * 64, 64, 64);
-
+		Sprite sprite = ArtResource.instance().getSprite(2, 2);
 		obj.setSprite(sprite);
 		obj.setConnectionSourceObject(sourceObj);
 		obj.setConnectionTargetObject(targetObj);

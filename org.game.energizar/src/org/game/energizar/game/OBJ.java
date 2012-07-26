@@ -4,7 +4,7 @@ import net.rim.device.api.ui.XYPoint;
 
 import org.game.energizar.game.datatypes.Direction;
 import org.game.energizar.game.datatypes.Path;
-import org.game.energizar.sprites.Sprite;
+import org.game.energizar.game.features.SpriteProvider;
 
 // OBJ is our root class for all objects, it defines behaviors and properties
 // that are the same for ll objects, whether its the hero, enemies, or photons
@@ -54,15 +54,15 @@ public class OBJ {
 		return this._path;
 	}
 
-	// FEATURE Sprite
-	private Sprite _sprite;
+	// FEATURE SpriteProvider
+	private SpriteProvider _spriteProvider;
 
-	public Sprite getSprite() {
-		return _sprite;
+	public SpriteProvider getSpriteProvider() {
+		return _spriteProvider;
 	}
 
-	public void setSprite(Sprite sprite) {
-		this._sprite = sprite;
+	public void setSpriteProvider(SpriteProvider spriteProvider) {
+		_spriteProvider = spriteProvider;
 	}
 
 	// FEATURE Direção

@@ -19,14 +19,18 @@ public class SpriteDrawer {
 	public static void drawObject(OBJ obj, Graphics g, int screenSpriteWidth,
 			int screenSpriteHeitght, int screenOffsetX, int screenOffsetY) {
 
+		if (obj.getSpriteProvider() == null) {
+			return;
+		}
+
 		// objetos que tenham posição
 		// devem ter seu sprite desenhados em sua posição
-		Sprite sprite = obj.getSprite();
+		Sprite sprite = obj.getSpriteProvider().getSprite();
 		if (sprite != null && obj.getPos() != null) {
 			XYPoint worldSpritePosition = obj.getPos();
 
-			sprite.drawSprite(worldSpritePosition, screenSpriteWidth,
-					screenSpriteHeitght, screenOffsetX, screenOffsetY, g);
+			sprite.drawSprite(g, worldSpritePosition, screenSpriteWidth,
+					screenSpriteHeitght, screenOffsetX, screenOffsetY);
 
 		}
 
@@ -35,8 +39,8 @@ public class SpriteDrawer {
 		if (sprite != null && obj.getPath() != null) {
 			for (int i = 0; i < obj.getPath().length(); i++) {
 				XYPoint worldSpritePosition = obj.getPath().get(i);
-				sprite.drawSprite(worldSpritePosition, screenSpriteWidth,
-						screenSpriteHeitght, screenOffsetX, screenOffsetY, g);
+				sprite.drawSprite(g, worldSpritePosition, screenSpriteWidth,
+						screenSpriteHeitght, screenOffsetX, screenOffsetY);
 			}
 		}
 	}

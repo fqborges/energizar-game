@@ -1,6 +1,5 @@
 package org.game.energizar.sprites;
 
-
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.XYPoint;
@@ -39,24 +38,23 @@ public class Sprite {
 	}
 
 	/**
-	 * @param sprite
+	 * @param g
 	 * @param worldSpritePosition
 	 * @param screenSpriteWidth
 	 * @param screenSpriteHeitght
 	 * @param screenOffsetX
 	 * @param screenOffsetY
-	 * @param g
+	 * @param sprite
 	 */
-	public void drawSprite(XYPoint worldSpritePosition, int screenSpriteWidth,
-			int screenSpriteHeitght, int screenOffsetX, int screenOffsetY,
-			Graphics g) {
-		XYPoint screenSpritePosition = Sprite
-				.translateToScreenCoordinates(worldSpritePosition,
-						screenSpriteWidth, screenSpriteHeitght, screenOffsetX,
-						screenOffsetY);
+	public void drawSprite(Graphics g, XYPoint worldSpritePosition,
+			int screenSpriteWidth, int screenSpriteHeitght, int screenOffsetX,
+			int screenOffsetY) {
+		XYPoint screenSpritePosition = Sprite.translateToScreenCoordinates(
+				worldSpritePosition, screenSpriteWidth, screenSpriteHeitght,
+				screenOffsetX, screenOffsetY);
 
-		Sprite.drawToScreen(this, g, screenSpritePosition,
-				screenSpriteWidth, screenSpriteHeitght);
+		Sprite.drawToScreen(this, g, screenSpritePosition, screenSpriteWidth,
+				screenSpriteHeitght);
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class Sprite {
 				+ worldSpritePosition.x * screenSpriteWidth;
 		int posicaoYSpriteEmCoordeadasDeTela = screenOffsetY
 				+ worldSpritePosition.y * screenSpriteHeitght;
-	
+
 		XYPoint posicaoSpriteCoordenadasTela = new XYPoint(
 				posicaoXSpriteEmCoordeadasDeTela,
 				posicaoYSpriteEmCoordeadasDeTela);
@@ -94,12 +92,12 @@ public class Sprite {
 		// cria um bitmap para ser o buffer dos blocos
 		Bitmap block = new Bitmap(screenSpriteWidth, screenSpriteHeitght);
 		block.createAlpha();
-	
+
 		// escala a sprite no buffer
 		sprite.getBitmap().scaleInto(sprite.getRect().x, sprite.getRect().y,
 				sprite.getRect().width, sprite.getRect().height, block, 0, 0,
 				screenSpriteWidth, screenSpriteHeitght, Bitmap.FILTER_BILINEAR);
-	
+
 		g.drawBitmap(screenSpritePosition.x, screenSpritePosition.y,
 				screenSpriteWidth, screenSpriteHeitght, block, 0, 0);
 	}

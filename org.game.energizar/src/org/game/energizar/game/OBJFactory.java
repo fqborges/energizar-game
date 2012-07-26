@@ -5,6 +5,7 @@ import net.rim.device.api.ui.XYPoint;
 
 import org.game.energizar.game.datatypes.Direction;
 import org.game.energizar.game.datatypes.Path;
+import org.game.energizar.game.features.SpriteProvider;
 import org.game.energizar.sprites.Sprite;
 
 public class OBJFactory {
@@ -38,7 +39,8 @@ public class OBJFactory {
 					direction = direction.RotateCCW();
 				} while (direction != Direction.Up);
 
-				this.setSprite(ArtResource.instance().getSprite(row, col));
+				this.setSpriteProvider(new SpriteProvider(ArtResource
+						.instance().getSprite(row, col)));
 
 				// verify if state changed
 				if (this.isJunctionStateChanged()) {
@@ -79,7 +81,7 @@ public class OBJFactory {
 				0 * ArtResource.SPRITE_SIZE, 0 * ArtResource.SPRITE_SIZE,
 				ArtResource.SPRITE_SIZE, ArtResource.SPRITE_SIZE);
 
-		obj.setSprite(sprite);
+		obj.setSpriteProvider(new SpriteProvider(sprite));
 
 		return obj;
 	}
@@ -93,7 +95,7 @@ public class OBJFactory {
 		int row = 2;
 		int col = 7;
 		Sprite sprite = ArtResource.instance().getSprite(row, col);
-		obj.setSprite(sprite);
+		obj.setSpriteProvider(new SpriteProvider(sprite));
 
 		return obj;
 	}
@@ -106,7 +108,7 @@ public class OBJFactory {
 		int row = 2;
 		int col = 0;
 		Sprite sprite = ArtResource.instance().getSprite(row, col);
-		obj.setSprite(sprite);
+		obj.setSpriteProvider(new SpriteProvider(sprite));
 
 		return obj;
 	}
@@ -120,7 +122,7 @@ public class OBJFactory {
 		int row = 2;
 		int col = 2;
 		Sprite sprite = ArtResource.instance().getSprite(row, col);
-		obj.setSprite(sprite);
+		obj.setSpriteProvider(new SpriteProvider(sprite));
 
 		obj.setTimer(new Timer(5, new Runnable() {
 			public void run() {
@@ -175,7 +177,7 @@ public class OBJFactory {
 			}
 		}
 
-		obj.setSprite(sprite);
+		obj.setSpriteProvider(new SpriteProvider(sprite));
 
 		obj.setConnectionSourceObject(sourceObj);
 		obj.setConnectionTargetObject(targetObj);

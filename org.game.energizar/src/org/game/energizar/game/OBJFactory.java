@@ -38,14 +38,14 @@ public class OBJFactory {
 				// verify if state changed
 				if (stateChanged(gameData)) {
 					// if now it is power on and disconnected
-					if (this.getJunctionState() == OBJ.JUNCTION_ON
+					if (this.getPoweredState() == OBJ.POWER_ON
 							&& !OBJ.isSourceOfAnyConnection(this, gameData)) {
 						final OBJ thisRef = this;
 						this.setTimer(new Timer(10) {
 							protected void run(GameLevel gameData) {
 								// if junction is off or is connected then
 								// disarm
-								if (thisRef.getJunctionState() == OBJ.JUNCTION_OFF
+								if (thisRef.getPoweredState() == OBJ.POWER_OFF
 										|| OBJ.isSourceOfAnyConnection(thisRef,
 												gameData)) {
 									// disarm and unset clock
@@ -72,10 +72,10 @@ public class OBJFactory {
 						gameData);
 
 				// if state changed or first time it runs
-				if (this.getJunctionState() != _lastJunctionState
+				if (this.getPoweredState() != _lastJunctionState
 						|| _lastIsSourceState != isSourceState || _firstTime) {
 					// copy state for next run
-					_lastJunctionState = this.getJunctionState();
+					_lastJunctionState = this.getPoweredState();
 					_lastIsSourceState = isSourceState;
 					// clear first time guard
 					_firstTime = false;
@@ -88,11 +88,12 @@ public class OBJFactory {
 
 		obj.setPos(x, y);
 		obj.setDirection(Direction.Left);
+		obj.poweredPowerOff();
 
 		SpriteProvider spriteProvider = new SpriteProvider() {
 			public Sprite getSprite() {
 				// row defined by junction state
-				int row = obj.getJunctionState() == OBJ.JUNCTION_OFF ? 0 : 1;
+				int row = obj.getPoweredState() == OBJ.POWER_ON ? 1 : 0;
 				// col defined by direction
 				int col = 0;
 				Direction direction = Direction.Up;
@@ -130,10 +131,17 @@ public class OBJFactory {
 
 		obj.setPos(x, y);
 
-		int row = 2;
-		int col = 0;
-		Sprite sprite = ArtResource.instance().getSprite(row, col);
-		obj.setSpriteProvider(new SimpleSpriteProvider(sprite));
+		SpriteProvider spriteProvider = new SpriteProvider() {
+			public Sprite getSprite() {
+				if (obj.getPoweredState() == OBJ.POWER_ON) {
+					return ArtResource.instance().getSprite(2, 0);
+				} else {
+					return ArtResource.instance().getSprite(2, 1);
+				}
+			}
+		};
+
+		obj.setSpriteProvider(spriteProvider);
 
 		return obj;
 	}

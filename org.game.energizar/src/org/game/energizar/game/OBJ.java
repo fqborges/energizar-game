@@ -39,7 +39,7 @@ public class OBJ {
 		object.setDirection(null);
 		object.setTimer(null);
 		object.notifyShotHandled();
-		object.setJunctionState(JUNCTION_STATE_NULL);
+		object.setPoweredState(POWER_STATE_NULL);
 		object.setConnectionSourceObject(null);
 		object.setConnectionTargetObject(null);
 
@@ -127,33 +127,28 @@ public class OBJ {
 		this._shootingState = IDLE;
 	}
 
-	// FEATURE junction
-	protected final static int JUNCTION_STATE_NULL = 0;
-	protected final static int JUNCTION_OFF = 1;
-	protected final static int JUNCTION_ON = 2;
-	// protected final static int JUNCTION_CONNECTED = 3;
+	// FEATURE Powered
+	protected final static int POWER_STATE_NULL = 0;
+	protected final static int POWER_OFF = 1;
+	protected final static int POWER_ON = 2;
 
-	private int _junctionState = JUNCTION_OFF;
+	private int _junctionState = POWER_STATE_NULL;
 
-	private void setJunctionState(int state) {
+	private void setPoweredState(int state) {
 		this._junctionState = state;
 	}
 
-	public int getJunctionState() {
+	public int getPoweredState() {
 		return _junctionState;
 	}
 
-	public void junctionPowerOn() {
-		this.setJunctionState(JUNCTION_ON);
-	};
+	public void poweredPowerOn() {
+		this.setPoweredState(POWER_ON);
+	}
 
-	// public void junctionNotifyDisconnected() {
-	// this.setJunctionState(JUNCTION_ON);
-	// }
-
-	// public void junctionNotifyConected() {
-	// this.setJunctionState(JUNCTION_CONNECTED);
-	// };
+	public void poweredPowerOff() {
+		this.setPoweredState(POWER_OFF);
+	}
 
 	// Feature Connection
 	private OBJ _connectionSourceObj;
@@ -177,7 +172,8 @@ public class OBJ {
 	}
 
 	// FEATURE Connected
-	public static OBJ getAnyConnectedConnection(OBJ object, GameLevel gameLevel) {
+	public static OBJ getFirstFoundConnectedConnection(OBJ object,
+			GameLevel gameLevel) {
 
 		Vector objsInLevel = gameLevel.objects();
 

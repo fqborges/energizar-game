@@ -159,7 +159,7 @@ public class GameLogic {
 			if (otherObj == bullet)
 				continue;
 
-			// cant hit objetcts without a position
+			// cannot hit objects without a position
 			if (otherObj.getPos() == null) {
 				continue;
 			}
@@ -173,32 +173,52 @@ public class GameLogic {
 		}
 
 		// if it hits a junction
-		if (bHit && theHitObject.getTypeID() == OBJType.JUNCTION) {
+		if (bHit) {
 
-			OBJ junction = theHitObject;
-			// gets the object connection
-			OBJ connection = OBJ.getAnyConnectedConnection(bullet, gameLevel);
-			if (connection != null) {
-				// it now target the hit object
-				connection.setConnectionTargetObject(junction);
+			if (theHitObject.getTypeID() == OBJType.JUNCTION
+					|| theHitObject.getTypeID() == OBJType.ENDPOINT) {
+				// gets the bullet connection
+				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
+						gameLevel);
+				if (connection != null) {
+					// it now target the hit object
+					connection.setConnectionTargetObject(theHitObject);
+				}
 			}
 
-			// powers on and focus the junction
-			junction.junctionPowerOn();
-			gameLevel.setFocusedObject(junction);
+			// if it hit a junction
+			if (theHitObject.getTypeID() == OBJType.JUNCTION) {
+				OBJ junction = theHitObject;
+				// powers on and focus the junction
+				junction.poweredPowerOn();
+				gameLevel.setFocusedObject(junction);
+			}
+
+			// if hit the endpoint
+			if (theHitObject.getTypeID() == OBJType.ENDPOINT) {
+				OBJ endpoint = theHitObject;
+				// powers on the endpoint
+				endpoint.poweredPowerOn();
+
+				// setup a timer to end the game
+				OBJ timerToEnd = new OBJ(OBJType.TIMER);
+				timerToEnd.setTimer(new Timer(20) {
+					protected void run(GameLevel gameLevel) {
+						gameLevel.endGame();
+					}
+				});
+
+				gameLevel.objects().addElement(timerToEnd);
+			}
 
 			// destroy the bullet
 			OBJ.nullify(bullet);
 
-		} else // if it hits an endpoint
-		if (bHit && theHitObject.getTypeID() == OBJType.ENDPOINT) {
-			// end the game
-			gameLevel.endGame();
 		} else {
 			// if the bullet leaves the level
 			if (!gameLevel.getGameArea().contains(bullet.getPos())) {
 				// gets the bullet connection
-				OBJ connection = OBJ.getAnyConnectedConnection(bullet,
+				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
 						gameLevel);
 				if (connection != null) {
 					// focus the original shooter again

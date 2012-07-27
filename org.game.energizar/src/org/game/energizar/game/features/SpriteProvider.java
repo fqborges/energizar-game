@@ -2,21 +2,16 @@ package org.game.energizar.game.features;
 
 import org.game.energizar.sprites.Sprite;
 
-/**
- * Provides sprites for an Object.
- * 
- * @author Filipe
- * 
- */
-public class SpriteProvider {
-	private Sprite _sprite;
+public abstract class SpriteProvider {
 
-	public SpriteProvider(Sprite sprite) {
-		this._sprite = sprite;
+	public SpriteProvider() {
+		super();
 	}
 
-	public Sprite getSprite() {
-		return this._sprite;
+	public abstract Sprite getSprite();
+
+	public Sprite[] getSprites() {
+		return new Sprite[] { this.getSprite() };
 	}
 
 }

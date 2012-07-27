@@ -36,12 +36,18 @@ public class SpriteDrawer {
 
 		// objetos que tenham caminho devem seu sprite
 		// desenhados ao longo do caminho
-		if (sprite != null && obj.getPath() != null) {
+		Sprite[] sprites = obj.getSpriteProvider().getSprites();
+		if (sprites != null && obj.getPath() != null
+				&& sprites.length == obj.getPath().length()) {
+			// para cada ponto do caminho...
 			for (int i = 0; i < obj.getPath().length(); i++) {
+				// desenha a sprite referente ao ponto
 				XYPoint worldSpritePosition = obj.getPath().get(i);
-				sprite.drawSprite(g, worldSpritePosition, screenSpriteWidth,
-						screenSpriteHeitght, screenOffsetX, screenOffsetY);
+				sprites[i].drawSprite(g, worldSpritePosition,
+						screenSpriteWidth, screenSpriteHeitght, screenOffsetX,
+						screenOffsetY);
 			}
+
 		}
 	}
 }

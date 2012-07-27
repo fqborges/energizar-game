@@ -21,7 +21,7 @@ public class Path {
 		return (XYPoint) _path.firstElement();
 	}
 
-	public Object getLast() {
+	public XYPoint getLast() {
 		return (XYPoint) _path.lastElement();
 	}
 

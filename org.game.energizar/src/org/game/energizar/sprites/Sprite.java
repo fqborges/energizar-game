@@ -90,16 +90,35 @@ public class Sprite {
 			XYPoint screenSpritePosition, int screenSpriteWidth,
 			int screenSpriteHeitght) {
 		// cria um bitmap para ser o buffer dos blocos
-		Bitmap block = new Bitmap(screenSpriteWidth, screenSpriteHeitght);
-		block.createAlpha();
+		Bitmap resizeBuffer = getResiszeBuffer(screenSpriteWidth,
+				screenSpriteHeitght);
 
 		// escala a sprite no buffer
 		sprite.getBitmap().scaleInto(sprite.getRect().x, sprite.getRect().y,
-				sprite.getRect().width, sprite.getRect().height, block, 0, 0,
-				screenSpriteWidth, screenSpriteHeitght, Bitmap.FILTER_BILINEAR);
+				sprite.getRect().width, sprite.getRect().height, resizeBuffer,
+				0, 0, screenSpriteWidth, screenSpriteHeitght,
+				Bitmap.FILTER_BILINEAR);
 
 		g.drawBitmap(screenSpritePosition.x, screenSpritePosition.y,
-				screenSpriteWidth, screenSpriteHeitght, block, 0, 0);
+				screenSpriteWidth, screenSpriteHeitght, resizeBuffer, 0, 0);
+	}
+
+	static Bitmap _resizeBuffer;
+
+	/**
+	 * @param screenSpriteWidth
+	 * @param screenSpriteHeitght
+	 * @return
+	 */
+	private static Bitmap getResiszeBuffer(int screenSpriteWidth,
+			int screenSpriteHeitght) {
+		if (_resizeBuffer == null
+				|| _resizeBuffer.getWidth() != screenSpriteWidth
+				|| _resizeBuffer.getHeight() != screenSpriteHeitght) {
+			_resizeBuffer = new Bitmap(screenSpriteWidth, screenSpriteHeitght);
+			_resizeBuffer.createAlpha();
+		}
+		return _resizeBuffer;
 	}
 
 }

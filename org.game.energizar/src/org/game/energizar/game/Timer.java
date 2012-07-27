@@ -6,25 +6,37 @@ public class Timer {
 	private int count;
 	private boolean disabled;
 
-	private final Runnable event;
+	private Runnable event;
 
-	public Timer(int timeInTicks, Runnable event) {
+	public Timer(int timeInTicks) {
 		this.ticks = timeInTicks;
 		this.count = 0;
-		this.event = event;
 		this.disabled = false;
 	}
 
-	public void tick() {
+	/**
+	 * Notifies this timer that time has passed.
+	 * 
+	 * @param miliseconds
+	 *            miliseconds since last run
+	 * @param gameLevel
+	 *            game data
+	 * 
+	 */
+	public void tick(int miliseconds, GameLevel gameLevel) {
 		if (this.disabled) {
 			return;
 		} else {
 			this.count++;
 			if (this.count > ticks) {
-				if (this.event != null) {
-					this.event.run();
-				}
+				run(gameLevel);
 			}
+		}
+	}
+
+	protected void run(GameLevel gameLevel) {
+		if (this.event != null) {
+			this.event.run();
 		}
 	}
 

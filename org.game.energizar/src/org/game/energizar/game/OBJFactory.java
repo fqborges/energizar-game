@@ -2,7 +2,6 @@ package org.game.energizar.game;
 
 import java.util.Vector;
 
-import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.XYPoint;
 
 import org.game.energizar.game.datatypes.Direction;
@@ -29,37 +28,60 @@ public class OBJFactory {
 	public OBJ createJunction(int x, int y) {
 
 		final OBJ obj = new OBJ(OBJType.JUNCTION) {
-			public void update(long gameTime, GameLevel gameData) {
+
+			private int _lastJunctionState;
+			private boolean _lastIsSourceState;
+			private boolean _firstTime = true;
+
+			public void update(long gameTime, final GameLevel gameData) {
 
 				// verify if state changed
-				if (this.isJunctionStateChanged()) {
-					this.clearJunctionStateChanged();
-
-					switch (this.getJunctionState()) {
-					case OBJ.ON:
+				if (stateChanged(gameData)) {
+					// if now it is power on and disconnected
+					if (this.getJunctionState() == OBJ.JUNCTION_ON
+							&& !OBJ.isSourceOfAnyConnection(this, gameData)) {
 						final OBJ thisRef = this;
-						Timer timer = new Timer(10, new Runnable() {
-							public void run() {
-								if (thisRef.getJunctionState() != OBJ.ON) {
-									return;
+						this.setTimer(new Timer(10) {
+							protected void run(GameLevel gameData) {
+								// if junction is off or is connected then
+								// disarm
+								if (thisRef.getJunctionState() == OBJ.JUNCTION_OFF
+										|| OBJ.isSourceOfAnyConnection(thisRef,
+												gameData)) {
+									// disarm and unset clock
+									thisRef.getTimer().disable();
+									thisRef.setTimer(null);
+								} else {
+									// else rotate the object CCW and
+									// run again
+									thisRef.setDirection(thisRef.getDirection()
+											.RotateCW());
+									thisRef.getTimer().reset();
 								}
-								thisRef.setDirection(thisRef.getDirection()
-										.RotateCW());
-								thisRef.getTimer().reset();
 							}
 						});
-						this.setTimer(timer);
-						break;
-					case OBJ.CONNECTED:
-					case OBJ.OFF:
-						if (this.getTimer() != null) {
-							this.getTimer().disable();
-							this.setTimer(null);
-						}
-						break;
-					default:
-						break;
 					}
+				}
+			}
+
+			/**
+			 * @return
+			 */
+			private boolean stateChanged(GameLevel gameData) {
+				boolean isSourceState = OBJ.isSourceOfAnyConnection(this,
+						gameData);
+
+				// if state changed or first time it runs
+				if (this.getJunctionState() != _lastJunctionState
+						|| _lastIsSourceState != isSourceState || _firstTime) {
+					// copy state for next run
+					_lastJunctionState = this.getJunctionState();
+					_lastIsSourceState = isSourceState;
+					// clear first time guard
+					_firstTime = false;
+					return true;
+				} else {
+					return false;
 				}
 			}
 		};
@@ -70,7 +92,7 @@ public class OBJFactory {
 		SpriteProvider spriteProvider = new SpriteProvider() {
 			public Sprite getSprite() {
 				// row defined by junction state
-				int row = obj.getJunctionState() == OBJ.OFF ? 0 : 1;
+				int row = obj.getJunctionState() == OBJ.JUNCTION_OFF ? 0 : 1;
 				// col defined by direction
 				int col = 0;
 				Direction direction = Direction.Up;
@@ -127,12 +149,12 @@ public class OBJFactory {
 		Sprite sprite = ArtResource.instance().getSprite(row, col);
 		obj.setSpriteProvider(new SimpleSpriteProvider(sprite));
 
-		obj.setTimer(new Timer(5, new Runnable() {
-			public void run() {
+		obj.setTimer(new Timer(4) {
+			protected void run(GameLevel gameLevel) {
 				XYPoint move = obj.getDirection().toMoveIncrement();
 				obj.setPos(obj.getPos().x + move.x, obj.getPos().y + move.y);
 			}
-		}));
+		});
 		return obj;
 	}
 

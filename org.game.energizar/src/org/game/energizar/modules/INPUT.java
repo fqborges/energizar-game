@@ -55,7 +55,7 @@ public class INPUT {
 		}
 
 		if (charsJustDown[Keypad.KEY_SPACE]) {
-			OBJ o = gameData.getCurrentObject();
+			OBJ o = gameData.getFocusedObject();
 
 			if (o != null) {
 				if (o.getTypeID() == OBJType.JUNCTION) {

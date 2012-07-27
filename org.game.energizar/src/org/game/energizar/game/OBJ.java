@@ -1,5 +1,8 @@
 package org.game.energizar.game;
 
+import java.util.Enumeration;
+import java.util.Vector;
+
 import net.rim.device.api.ui.XYPoint;
 
 import org.game.energizar.game.datatypes.Direction;
@@ -17,11 +20,31 @@ public class OBJ {
 	 * Cria um objeto com o tipo informado.
 	 */
 	OBJ(char typeID) {
-		this._typeID = typeID;
+		this.setTypeID(typeID);
 	}
 
 	public long getTypeID() {
 		return _typeID;
+	}
+
+	private void setTypeID(char typeID) {
+		_typeID = typeID;
+	}
+
+	public static void nullify(OBJ object) {
+		// nullify all object features
+		object.setPos(null);
+		object.setPath(null);
+		object.setSpriteProvider(null);
+		object.setDirection(null);
+		object.setTimer(null);
+		object.notifyShotHandled();
+		object.setJunctionState(JUNCTION_STATE_NULL);
+		object.setConnectionSourceObject(null);
+		object.setConnectionTargetObject(null);
+
+		// set object to null type
+		object.setTypeID(OBJType.NULL);
 	}
 
 	// FEATURE update
@@ -65,7 +88,7 @@ public class OBJ {
 		_spriteProvider = spriteProvider;
 	}
 
-	// FEATURE Direção
+	// FEATURE Direction
 	private Direction _direction = null;
 
 	public Direction getDirection() {
@@ -105,39 +128,32 @@ public class OBJ {
 	}
 
 	// FEATURE junction
-	protected final static int OFF = 0;
-	protected final static int ON = 1;
-	protected final static int CONNECTED = 2;
+	protected final static int JUNCTION_STATE_NULL = 0;
+	protected final static int JUNCTION_OFF = 1;
+	protected final static int JUNCTION_ON = 2;
+	// protected final static int JUNCTION_CONNECTED = 3;
 
-	private int _junctionState = OFF;
-	private boolean _junctionStateChanged = false;
+	private int _junctionState = JUNCTION_OFF;
 
 	private void setJunctionState(int state) {
-		if (this._junctionState != state) {
-			this._junctionState = state;
-			_junctionStateChanged = true;
-		}
+		this._junctionState = state;
 	}
 
 	public int getJunctionState() {
 		return _junctionState;
 	}
 
-	public boolean isJunctionStateChanged() {
-		return _junctionStateChanged;
-	}
-
-	public void clearJunctionStateChanged() {
-		this._junctionStateChanged = false;
-	}
-
-	public void powerOn() {
-		this.setJunctionState(ON);
+	public void junctionPowerOn() {
+		this.setJunctionState(JUNCTION_ON);
 	};
 
-	public void notifyConected() {
-		this.setJunctionState(CONNECTED);
-	};
+	// public void junctionNotifyDisconnected() {
+	// this.setJunctionState(JUNCTION_ON);
+	// }
+
+	// public void junctionNotifyConected() {
+	// this.setJunctionState(JUNCTION_CONNECTED);
+	// };
 
 	// Feature Connection
 	private OBJ _connectionSourceObj;
@@ -160,92 +176,34 @@ public class OBJ {
 		return _connectionTargetObj;
 	}
 
-	// Feature path
+	// FEATURE Connected
+	public static OBJ getAnyConnectedConnection(OBJ object, GameLevel gameLevel) {
 
-	// // Collision detection routine using an AABB test (Axis Align Bounding
-	// Box).
-	// // This
-	// // is a quick and easy test great for games with simple squarish sprites
-	// // which simply
-	// // looks to see if the bounding boxes overlap in any way.
-	// public static void collisionDetect(Vector passObjects) {
-	// OBJ tempObject1, tempObject2; // temporarily points to the two objects
-	// // being tested
-	// boolean intersect, check; // flags during testing
-	//
-	// // Loop through all objects in our vector
-	// for (int lcv = 0; lcv < passObjects.size(); lcv++) {
-	// // Set tempObject1 to the current object
-	// tempObject1 = (OBJ) passObjects.elementAt(lcv);
-	//
-	// // Now loop from the current object to the end of the vector
-	// for (int lcv2 = lcv; lcv2 < passObjects.size(); lcv2++) {
-	// // Set tempObject2 to the current object of the nested loop
-	// tempObject2 = (OBJ) passObjects.elementAt(lcv2);
-	//
-	// // See if we need to check for collision (e.g. some objects dont
-	// // matter if
-	// // they collide, enemy with enemy or fire with fire for example)
-	//
-	// // Assume we dont need to check
-	// check = false;
-	//
-	// // Hero and enemy would be something to check for
-	// if (tempObject1.getType() == "hero"
-	// && tempObject2.getType().startsWith("enemy"))
-	// check = true;
-	//
-	// // Hero and enemy fired photons would be something to check for
-	// if (tempObject1.getType() == "hero"
-	// && tempObject2.getType().startsWith("fire")
-	// && tempObject2.getParent().getType()
-	// .startsWith("enemy"))
-	// check = true;
-	//
-	// // Enemy and hero fired photons would be something ot check for
-	// if (tempObject1.getType().startsWith("enemy")
-	// && tempObject2.getType().startsWith("fire")
-	// && tempObject2.getParent().getType() == "hero")
-	// check = true;
-	//
-	// // If our check flag is set to true, and the state of the
-	// // objects is normal
-	// // (e.g. an object in a hit or exploded state can't collide with
-	// // something),
-	// // then lets check for the actual collision
-	// if (check && tempObject1.getState() == 0
-	// && tempObject2.getState() == 0) {
-	//
-	// // We assume the two objects collided
-	// intersect = true;
-	//
-	// // Left and Right sides of bounding box check
-	// if (!(Math.abs((tempObject1.getX() + tempObject1
-	// .getBitmap().getWidth() / 2)
-	// - (tempObject2.getX() + tempObject2.getBitmap()
-	// .getWidth() / 2)) <= tempObject1
-	// .getBitmap().getWidth()
-	// / 2
-	// + tempObject2.getBitmap().getWidth() / 2))
-	// intersect = false;
-	//
-	// // Top and Bottom sides of bounding box check
-	// if (!(Math.abs((tempObject1.getY() + tempObject1
-	// .getBitmap().getHeight() / 2)
-	// - (tempObject2.getY() + tempObject2.getBitmap()
-	// .getHeight() / 2)) <= tempObject1
-	// .getBitmap().getHeight()
-	// / 2
-	// + tempObject2.getBitmap().getHeight() / 2))
-	// intersect = false;
-	//
-	// // If the objects collided, damage each one.
-	// if (intersect) {
-	//
-	// }
-	// }
-	// }
-	// }
-	// }
+		Vector objsInLevel = gameLevel.objects();
 
+		for (Enumeration eachObject = objsInLevel.elements(); eachObject
+				.hasMoreElements();) {
+			OBJ connection = (OBJ) eachObject.nextElement();
+			if (connection.getConnectionSourceObject() == object
+					|| connection.getConnectionTargetObject() == object) {
+				return connection;
+			}
+		}
+		return null;
+	}
+
+	public static boolean isSourceOfAnyConnection(OBJ object,
+			GameLevel gameLevel) {
+
+		Vector objsInLevel = gameLevel.objects();
+
+		for (Enumeration eachObject = objsInLevel.elements(); eachObject
+				.hasMoreElements();) {
+			OBJ connection = (OBJ) eachObject.nextElement();
+			if (connection.getConnectionSourceObject() == object) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

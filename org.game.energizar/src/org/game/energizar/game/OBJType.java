@@ -8,5 +8,6 @@ public class OBJType {
 	public static final char STARTPOINT = 's';
 	public static final char BULLET = 'b';
 	public static final char CONNECTION = 'c';
+	public static final char NULL = ' ';
 
 }

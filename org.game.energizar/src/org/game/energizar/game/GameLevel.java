@@ -15,6 +15,7 @@ public class GameLevel {
 	private int _height;
 	private int _width;
 	private OBJ _currentObject = null;
+	private int _tries;
 
 	// cria um level do jogo
 	public GameLevel() {
@@ -24,6 +25,7 @@ public class GameLevel {
 		_isActive = true;
 		_hasError = false;
 		_errorMessage = null;
+		_tries = 3;
 
 		// inicializa o restante a partir de uma string
 		// com a descrição do level
@@ -84,7 +86,7 @@ public class GameLevel {
 				if (obj != null) {
 					this.objects().addElement(obj);
 					if (obj.getTypeID() == OBJType.STARTPOINT) {
-						this.setCurrentObject(obj);
+						this.setFocusedObject(obj);
 					}
 				}
 			}
@@ -148,11 +150,11 @@ public class GameLevel {
 		return new XYRect(0, 0, this._width, this._height);
 	}
 
-	public OBJ getCurrentObject() {
+	public OBJ getFocusedObject() {
 		return _currentObject;
 	}
 
-	public void setCurrentObject(OBJ currentObject) {
+	public void setFocusedObject(OBJ currentObject) {
 		this._currentObject = currentObject;
 	}
 
@@ -166,6 +168,14 @@ public class GameLevel {
 
 	public boolean getError() {
 		return this._hasError;
+	}
+
+	public int getRemainingTries() {
+		return this._tries;
+	}
+
+	public void lostShot() {
+		this._tries -= 1;
 	}
 
 }

@@ -20,9 +20,40 @@ public class GameLogic {
 
 	public void process(GameLevel gameLevel, int miliseconds) {
 
-		// objects to be deleted
-		Vector objsToBeDeleted = new Vector();
+		// updates all objects and timer features
+		updateTimersAndObjects(miliseconds, gameLevel);
 
+		// process focused object
+		processFocusedObject(gameLevel);
+
+		// process the current state for every element and apply game rules
+		for (Enumeration eachObject = gameLevel.objects().elements(); eachObject
+				.hasMoreElements();) {
+			OBJ object = (OBJ) eachObject.nextElement();
+
+			// if object is a bullet
+			if (object.getTypeID() == OBJType.BULLET) {
+				applyBulletRules(object, gameLevel);
+			}
+
+		} // end - process the current state for every element and apply game
+			// rules
+
+		// cleanup all objects
+		cleanupNullObjects(gameLevel);
+
+		// verify game state
+		if (gameLevel.getRemainingTries() <= 0) {
+			gameLevel.endGame();
+		}
+
+	}
+
+	/**
+	 * @param miliseconds
+	 * @param gameLevel
+	 */
+	private void updateTimersAndObjects(int miliseconds, GameLevel gameLevel) {
 		// objects in level
 		Vector objsInLevel = gameLevel.objects();
 
@@ -33,23 +64,29 @@ public class GameLogic {
 
 			// notifica o timer do elemento
 			if (obj.getTimer() != null) {
-				obj.getTimer().tick();
+				obj.getTimer().tick(miliseconds, gameLevel);
 			}
 
 			// notifica um elemento
 			obj.update(miliseconds, gameLevel);
 
 		}
+	}
 
-		// verifica se há um elemento com foco
-		if (gameLevel.getCurrentObject() != null) {
-			OBJ currObj = gameLevel.getCurrentObject();
+	/**
+	 * @param gameLevel
+	 */
+	private void processFocusedObject(GameLevel gameLevel) {
 
-			// se o elemento está atirando
+		// if there is a focused object
+		if (gameLevel.getFocusedObject() != null) {
+			OBJ currObj = gameLevel.getFocusedObject();
+
+			// if it is shooting
 			if (currObj.isShooting()) {
 
-				// cria um projétil na frente do objeto e que
-				// se move na direção do objeto direção
+				// creates a bullet in front of it
+				// that moves away from its direction
 				XYPoint move = currObj.getDirection().toMoveIncrement();
 				int posX = currObj.getPos().x + move.x;
 				int posY = currObj.getPos().y + move.y;
@@ -57,100 +94,123 @@ public class GameLogic {
 						currObj.getDirection());
 				gameLevel.objects().addElement(bullet);
 
-				// cria uma conexao entre o objeto e o projetil
+				// creates a connection to track bullet
+				// and (possibly) connects to other object
 				OBJ connection = OBJFactory.instance().createConnection(
 						currObj, bullet);
+				// currObj.setConnectedConnection(connection);
+				// bullet.setConnectedConnection(connection);
 				gameLevel.objects().addElement(connection);
 
-				//
-				currObj.notifyConected();
+				// TODO
+				// currObj.junctionNotifyConected();
 				currObj.notifyShotHandled();
 
-				// agora nenhum elemento tem foco
-				gameLevel.setCurrentObject(null);
+				// now there is no focused object
+				gameLevel.setFocusedObject(null);
 			}
 		}
+	}
 
-		// process the current state for every element and apply game rules
+	/**
+	 * Removes from game all NULL objects.
+	 * 
+	 * @param gameLevel
+	 * @param objsInLevel
+	 */
+	private void cleanupNullObjects(GameLevel gameLevel) {
+
+		Vector objsInLevel = gameLevel.objects();
+		Vector objsToDelete = new Vector();
+
+		// finds all null objects
 		for (Enumeration eachObject = objsInLevel.elements(); eachObject
 				.hasMoreElements();) {
 			OBJ object = (OBJ) eachObject.nextElement();
-
-			// if object is a bullet
-			if (object.getTypeID() == OBJType.BULLET) {
-
-				// verify if the bullet hits another object
-				boolean bHit = false;
-				OBJ oHit = null;
-				for (Enumeration eachOtherObject = objsInLevel.elements(); eachOtherObject
-						.hasMoreElements();) {
-					OBJ otherObj = (OBJ) eachOtherObject.nextElement();
-
-					// ignore hitting itself
-					if (otherObj == object)
-						continue;
-
-					// cant hit objetcts without a position
-					if (otherObj.getPos() == null) {
-						continue;
-					}
-
-					// if the two objects are in same position there is a hit
-					if (otherObj.getPos().equals(object.getPos())) {
-						bHit = true;
-						oHit = otherObj;
-						break;
-					}
-				}
-
-				// if it hits a junction
-				if (bHit && oHit.getTypeID() == OBJType.JUNCTION) {
-
-					// search for the connection targeting this object
-					OBJ connection = null;
-					for (Enumeration eachOtherObject = objsInLevel.elements(); eachOtherObject
-							.hasMoreElements();) {
-						OBJ other = (OBJ) eachObject.nextElement();
-						if (other.getTypeID() == OBJType.CONNECTION
-								&& other.getConnectionTargetObject() == object) {
-							connection = other;
-							break;
-						}
-
-					}
-
-					// if a connection was found
-					if (connection != null) {
-						// it will target the hit object
-						connection.setConnectionTargetObject(oHit);
-					}
-
-					oHit.powerOn();
-					gameLevel.setCurrentObject(oHit);
-					objsToBeDeleted.addElement(object);
-					continue;
-
-				} else // if it hits an endpoint
-				if (bHit && oHit.getTypeID() == OBJType.ENDPOINT) {
-					gameLevel.endGame();
-					continue;
-				}
-
-				// verify if the bullet leaves the level
-				if (!gameLevel.getGameArea().contains(object.getPos())) {
-					objsToBeDeleted.addElement(object);
-					continue;
-				}
-
+			if (object.getTypeID() == OBJType.NULL) {
+				objsToDelete.addElement(object);
 			}
-
-		} // end - process the current state for every element and apply game
-			// rules
-
-		// remove do jogo todos elementos que foram marcados para exclusao
-		for (Enumeration eToBeDeleted = objsToBeDeleted.elements(); eToBeDeleted
+		}
+		// deletes all null objects
+		for (Enumeration eToBeDeleted = objsToDelete.elements(); eToBeDeleted
 				.hasMoreElements();) {
 			gameLevel.objects().removeElement((OBJ) eToBeDeleted.nextElement());
+		}
+	}
+
+	/**
+	 * @param bullet
+	 * @param gameLevel
+	 * @param objsToBeDeleted
+	 * @param objsInLevel
+	 */
+	private void applyBulletRules(OBJ bullet, GameLevel gameLevel) {
+		//
+		Vector objsInLevel = gameLevel.objects();
+
+		// verify if the bullet hits another object
+		boolean bHit = false;
+		OBJ theHitObject = null;
+		for (Enumeration eachOtherObject = objsInLevel.elements(); eachOtherObject
+				.hasMoreElements();) {
+			OBJ otherObj = (OBJ) eachOtherObject.nextElement();
+
+			// ignore hitting itself
+			if (otherObj == bullet)
+				continue;
+
+			// cant hit objetcts without a position
+			if (otherObj.getPos() == null) {
+				continue;
+			}
+
+			// if the two objects are in same position there is a hit
+			if (otherObj.getPos().equals(bullet.getPos())) {
+				bHit = true;
+				theHitObject = otherObj;
+				break;
+			}
+		}
+
+		// if it hits a junction
+		if (bHit && theHitObject.getTypeID() == OBJType.JUNCTION) {
+
+			OBJ junction = theHitObject;
+			// gets the object connection
+			OBJ connection = OBJ.getAnyConnectedConnection(bullet, gameLevel);
+			if (connection != null) {
+				// it now target the hit object
+				connection.setConnectionTargetObject(junction);
+			}
+
+			// powers on and focus the junction
+			junction.junctionPowerOn();
+			gameLevel.setFocusedObject(junction);
+
+			// destroy the bullet
+			OBJ.nullify(bullet);
+
+		} else // if it hits an endpoint
+		if (bHit && theHitObject.getTypeID() == OBJType.ENDPOINT) {
+			// end the game
+			gameLevel.endGame();
+		} else {
+			// if the bullet leaves the level
+			if (!gameLevel.getGameArea().contains(bullet.getPos())) {
+				// gets the bullet connection
+				OBJ connection = OBJ.getAnyConnectedConnection(bullet,
+						gameLevel);
+				if (connection != null) {
+					// focus the original shooter again
+					OBJ shooter = connection.getConnectionSourceObject();
+					gameLevel.setFocusedObject(shooter);
+					// destroy the connection
+					OBJ.nullify(connection);
+				}// destroy the bullet
+				OBJ.nullify(bullet);
+
+				gameLevel.lostShot();
+			}
 		}
 	}
 }

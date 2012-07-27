@@ -33,7 +33,7 @@ public class INPUT {
 		moveDy = 0;
 	}
 
-	public void process(GameLevel gameData, int miliseconds) {
+	public void process(GameLevel gameData, int milliseconds) {
 
 		// OBJ o = (OBJ) gameData.objects().elementAt(0);
 		//

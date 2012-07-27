@@ -17,13 +17,13 @@ public class Timer {
 	/**
 	 * Notifies this timer that time has passed.
 	 * 
-	 * @param miliseconds
-	 *            miliseconds since last run
+	 * @param milliseconds
+	 *            milliseconds since last run
 	 * @param gameLevel
 	 *            game data
 	 * 
 	 */
-	public void tick(int miliseconds, GameLevel gameLevel) {
+	public void tick(int milliseconds, GameLevel gameLevel) {
 		if (this.disabled) {
 			return;
 		} else {

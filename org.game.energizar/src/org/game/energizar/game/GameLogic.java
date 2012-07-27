@@ -18,10 +18,18 @@ public class GameLogic {
 	private GameLogic() {
 	}
 
-	public void process(GameLevel gameLevel, int miliseconds) {
+	/**
+	 * Update the game one game tick.
+	 * 
+	 * @param gameLevel
+	 *            current game data
+	 * @param milliseconds
+	 *            milliseconds elapsed since last tick
+	 */
+	public void process(GameLevel gameLevel, int milliseconds) {
 
 		// updates all objects and timer features
-		updateTimersAndObjects(miliseconds, gameLevel);
+		updateTimersAndObjects(milliseconds, gameLevel);
 
 		// process focused object
 		processFocusedObject(gameLevel);
@@ -50,10 +58,14 @@ public class GameLogic {
 	}
 
 	/**
-	 * @param miliseconds
+	 * Update all timer features and object update features
+	 * 
+	 * @param milliseconds
+	 *            milliseconds elapsed since last update
 	 * @param gameLevel
+	 *            current game data
 	 */
-	private void updateTimersAndObjects(int miliseconds, GameLevel gameLevel) {
+	private void updateTimersAndObjects(int milliseconds, GameLevel gameLevel) {
 		// objects in level
 		Vector objsInLevel = gameLevel.objects();
 
@@ -64,17 +76,20 @@ public class GameLogic {
 
 			// notifica o timer do elemento
 			if (obj.getTimer() != null) {
-				obj.getTimer().tick(miliseconds, gameLevel);
+				obj.getTimer().tick(milliseconds, gameLevel);
 			}
 
 			// notifica um elemento
-			obj.update(miliseconds, gameLevel);
+			obj.update(milliseconds, gameLevel);
 
 		}
 	}
 
 	/**
+	 * Process rules for the focused object.
+	 * 
 	 * @param gameLevel
+	 *            current game data
 	 */
 	private void processFocusedObject(GameLevel gameLevel) {
 
@@ -116,7 +131,7 @@ public class GameLogic {
 	 * Removes from game all NULL objects.
 	 * 
 	 * @param gameLevel
-	 * @param objsInLevel
+	 *            current game data
 	 */
 	private void cleanupNullObjects(GameLevel gameLevel) {
 
@@ -139,10 +154,12 @@ public class GameLogic {
 	}
 
 	/**
+	 * Apply game rules for bullets.
+	 * 
 	 * @param bullet
+	 *            the bullet
 	 * @param gameLevel
-	 * @param objsToBeDeleted
-	 * @param objsInLevel
+	 *            current game data
 	 */
 	private void applyBulletRules(OBJ bullet, GameLevel gameLevel) {
 		//
@@ -172,33 +189,43 @@ public class GameLogic {
 			}
 		}
 
-		// if it hits a junction
+		// if it hits an object
 		if (bHit) {
 
+			// if it hit a unpowered junction
 			if (theHitObject.getTypeID() == OBJType.JUNCTION
-					|| theHitObject.getTypeID() == OBJType.ENDPOINT) {
+					&& theHitObject.getPoweredState() == OBJ.POWER_OFF) {
+				OBJ junction = theHitObject;
+
+				// powers on and focus the junction
+				junction.poweredPowerOn();
+				gameLevel.setFocusedObject(junction);
+
 				// gets the bullet connection
 				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
 						gameLevel);
 				if (connection != null) {
 					// it now target the hit object
-					connection.setConnectionTargetObject(theHitObject);
+					connection.setConnectionTargetObject(junction);
 				}
-			}
+				// destroy the bullet
+				OBJ.nullify(bullet);
 
-			// if it hit a junction
-			if (theHitObject.getTypeID() == OBJType.JUNCTION) {
-				OBJ junction = theHitObject;
-				// powers on and focus the junction
-				junction.poweredPowerOn();
-				gameLevel.setFocusedObject(junction);
-			}
-
+			} else
 			// if hit the endpoint
 			if (theHitObject.getTypeID() == OBJType.ENDPOINT) {
 				OBJ endpoint = theHitObject;
+
 				// powers on the endpoint
 				endpoint.poweredPowerOn();
+
+				// gets the bullet connection
+				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
+						gameLevel);
+				if (connection != null) {
+					// it now target the hit object
+					connection.setConnectionTargetObject(endpoint);
+				}
 
 				// setup a timer to end the game
 				OBJ timerToEnd = new OBJ(OBJType.TIMER);
@@ -209,28 +236,45 @@ public class GameLogic {
 				});
 
 				gameLevel.objects().addElement(timerToEnd);
-			}
-
-			// destroy the bullet
-			OBJ.nullify(bullet);
-
-		} else {
-			// if the bullet leaves the level
-			if (!gameLevel.getGameArea().contains(bullet.getPos())) {
-				// gets the bullet connection
-				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
-						gameLevel);
-				if (connection != null) {
-					// focus the original shooter again
-					OBJ shooter = connection.getConnectionSourceObject();
-					gameLevel.setFocusedObject(shooter);
-					// destroy the connection
-					OBJ.nullify(connection);
-				}// destroy the bullet
+				// destroy the bullet
 				OBJ.nullify(bullet);
-
-				gameLevel.lostShot();
+			} else {
+				// it hits an unexpected object
+				handleLostBullet(bullet, gameLevel);
 			}
+
+		} else
+		// if the bullet leaves the level
+		if (!gameLevel.getGameArea().contains(bullet.getPos())) {
+			// it is lost
+			handleLostBullet(bullet, gameLevel);
 		}
+
+	}
+
+	/**
+	 * Handles an lost bullet. Any connection attached to the bullet is
+	 * destroyed and the shooter is focused again.
+	 * 
+	 * @param bullet
+	 *            the bullet
+	 * @param gameLevel
+	 *            current game data
+	 */
+	private void handleLostBullet(OBJ bullet, GameLevel gameLevel) {
+		// gets the bullet connection
+		OBJ connection = OBJ
+				.getFirstFoundConnectedConnection(bullet, gameLevel);
+		if (connection != null) {
+			// focus the original shooter again
+			OBJ shooter = connection.getConnectionSourceObject();
+			gameLevel.setFocusedObject(shooter);
+			// destroy the connection
+			OBJ.nullify(connection);
+		}// destroy the bullet
+		OBJ.nullify(bullet);
+
+		// lost this try
+		gameLevel.loseTry();
 	}
 }

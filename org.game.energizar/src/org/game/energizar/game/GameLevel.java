@@ -174,7 +174,7 @@ public class GameLevel {
 		return this._tries;
 	}
 
-	public void lostShot() {
+	public void loseTry() {
 		this._tries -= 1;
 	}
 

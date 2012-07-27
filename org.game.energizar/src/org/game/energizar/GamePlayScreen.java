@@ -47,7 +47,7 @@ public class GamePlayScreen extends FullScreen {
 	// update the background,
 	// update score, check for end of game, etc. This is the main heartbeat.
 	private class GamePlayLoop extends Thread {
-		private static final int MILISECONDS_PER_TICK = 50;
+		private static final int MILLISECONDS_PER_TICK = 50;
 
 		// When the object is created it starts itself as a thread
 		GamePlayLoop() {
@@ -60,10 +60,10 @@ public class GamePlayScreen extends FullScreen {
 			while (_gameLevel.isGameActive()) {
 
 				// processa as interações do usuário.
-				INPUT.instance().process(_gameLevel, MILISECONDS_PER_TICK);
+				INPUT.instance().process(_gameLevel, MILLISECONDS_PER_TICK);
 
 				// aplica as regras do jogo
-				GameLogic.instance().process(_gameLevel, MILISECONDS_PER_TICK);
+				GameLogic.instance().process(_gameLevel, MILLISECONDS_PER_TICK);
 
 				// causa o redesenho da tela.
 				// gera uma execução do método paint
@@ -72,7 +72,7 @@ public class GamePlayScreen extends FullScreen {
 
 				try {
 					// Attempt to sleep for 50 ms
-					Thread.sleep(MILISECONDS_PER_TICK);
+					Thread.sleep(MILLISECONDS_PER_TICK);
 
 				} catch (InterruptedException e) {
 					// Do nothing if we couldn't sleep, we don't care about

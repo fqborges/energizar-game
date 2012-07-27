@@ -27,7 +27,4 @@ public class ArtResource {
 		return sprite;
 	}
 
-	public Bitmap getBitmap() {
-		return _bitmap;
-	}
 }

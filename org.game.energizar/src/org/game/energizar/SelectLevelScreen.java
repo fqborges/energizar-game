@@ -28,6 +28,7 @@ import net.rim.device.api.ui.decor.Border;
 import net.rim.device.api.ui.decor.BorderFactory;
 
 import org.game.energizar.game.GameLevelRepository;
+import org.game.energizar.game.GameLevelRepository.LevelDescriptor;
 
 public class SelectLevelScreen extends MainScreen {
 
@@ -70,10 +71,10 @@ public class SelectLevelScreen extends MainScreen {
 			public Field[] getDataFields(int modelRowIndex) {
 				TableModel theModel = (TableModel) getView().getModel();
 
-				// obtem a despesa da linha.
+				// obtem level da linha.
 				Object[] rowData = (Object[]) theModel.getRow(modelRowIndex);
-				Object despesa = rowData[0];
-				String valor = (String) despesa;
+				LevelDescriptor level = (LevelDescriptor) rowData[0];
+				String name = level.getName();
 
 				// cria os campos
 				Bitmap bmpOrig = Bitmap.getBitmapResource("explosao.png");
@@ -82,11 +83,11 @@ public class SelectLevelScreen extends MainScreen {
 				bmpOrig.scaleInto(bmpIcone, Bitmap.FILTER_BILINEAR);
 				BitmapField bmfIcone = new BitmapField(bmpIcone);
 
-				LabelField lblValor = new LabelField(valor, Field.USE_ALL_WIDTH
+				LabelField lblName = new LabelField(name, Field.USE_ALL_WIDTH
 						| DrawStyle.ELLIPSIS);
 
 				// return new Field[] { bmfIcone, lblValor };
-				return new Field[] { lblValor };
+				return new Field[] { lblName };
 			}
 		};
 
@@ -96,12 +97,12 @@ public class SelectLevelScreen extends MainScreen {
 
 		// RegionStyles iconeStyle = new RegionStyles(borderBottom, null, null,
 		// null, RegionStyles.ALIGN_CENTER, RegionStyles.ALIGN_MIDDLE);
-		RegionStyles valorStyle = new RegionStyles(borderBottom,
+		RegionStyles styleName = new RegionStyles(borderBottom,
 				Font.getDefault(), null, null, RegionStyles.ALIGN_LEFT,
 				RegionStyles.ALIGN_MIDDLE);
 		// col,row colsxrows
 		// | 0,0 1x1 | 1,0 1x1 |
-		dtTemplate.createRegion(new XYRect(0, 0, 1, 1), valorStyle);
+		dtTemplate.createRegion(new XYRect(0, 0, 1, 1), styleName);
 		// dtTemplate.createRegion(new XYRect(1, 0, 1, 1), valorStyle);
 		dtTemplate.setRowProperties(0, new TemplateRowProperties(60));
 		// dtTemplate.setColumnProperties(0, new TemplateColumnProperties(60));
@@ -121,11 +122,11 @@ public class SelectLevelScreen extends MainScreen {
 			_tbModel.removeRowRangeAt(0, _tbModel.getNumberOfRows());
 		}
 
-		String[] levels;
+		LevelDescriptor[] levels;
 		try {
 			levels = GameLevelRepository.instance().getGameLevels();
 		} catch (final Exception e) {
-			levels = new String[] {};
+			levels = new LevelDescriptor[] {};
 			UiApplication.getUiApplication().invokeLater(new Runnable() {
 				public void run() {
 					Dialog.alert(e.getMessage());
@@ -134,8 +135,7 @@ public class SelectLevelScreen extends MainScreen {
 		}
 
 		for (int i = 0; i < levels.length; i++) {
-			// String level = levels[i];
-			_tbModel.addRow(new Object[] { "Level " + (i + 1) });
+			_tbModel.addRow(new Object[] { levels[i] });
 		}
 
 		_tbModel.modelReset();
@@ -143,10 +143,8 @@ public class SelectLevelScreen extends MainScreen {
 
 	private void levelSelecionado(final TableView tbView) {
 		int row = tbView.getRowNumberWithFocus();
-		String[] levels = GameLevelRepository.instance().getGameLevels();
-		// Object d = _tbModel.getElement(row, 0);
+		LevelDescriptor level = (LevelDescriptor) _tbModel.getElement(row, 0);
 		UiApplication.getUiApplication().pushModalScreen(
-				new GamePlayScreen(levels[row]));
+				new GamePlayScreen(level));
 	}
-
 }

@@ -6,6 +6,7 @@ import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.container.FullScreen;
 
 import org.game.energizar.game.GameLevel;
+import org.game.energizar.game.GameLevelRepository.LevelDescriptor;
 import org.game.energizar.game.GameLogic;
 import org.game.energizar.modules.GFX;
 import org.game.energizar.modules.INPUT;
@@ -24,6 +25,9 @@ import org.game.energizar.modules.INPUT;
 //
 public class GamePlayScreen extends FullScreen {
 
+	// description of the level
+	private final LevelDescriptor _levelDescriptior;
+
 	// dados persistentes do jogo
 	private GameLevel _gameLevel;
 
@@ -32,14 +36,37 @@ public class GamePlayScreen extends FullScreen {
 
 	// O construtor inicializa o jogo e dispara a thread que
 	// executa o loop do jogo
-	public GamePlayScreen(String levelData) {
+	public GamePlayScreen(LevelDescriptor level) {
+		// keep level descriptor
+		_levelDescriptior = level;
 
-		// level corrente
-		_gameLevel = new GameLevel(levelData);
+		// display start message
+		showStartingTip();
 
-		// inicializa a instância do gameloop
+		// starts a new game in this level
+		startGame();
+
+	}
+
+	/**
+	 * shows the tip if the level has one.
+	 */
+	private void showStartingTip() {
+		if (_levelDescriptior.getTip() != null) {
+			UiApplication.getUiApplication().invokeLater(new Runnable() {
+				public void run() {
+					Dialog.inform(_levelDescriptior.getTip());
+				}
+			});
+		}
+	}
+
+	private void startGame() {
+		// game data
+		_gameLevel = new GameLevel(_levelDescriptior.getData());
+
+		// starts a new gameloop
 		_gameLoop = new GamePlayLoop();
-
 	}
 
 	// Refresh is a type of thread that runs to refresh the game.
@@ -81,22 +108,40 @@ public class GamePlayScreen extends FullScreen {
 				}
 			}
 
-			UiApplication.getUiApplication().invokeLater(new Runnable() {
-				public void run() {
-					UiApplication.getUiApplication().popScreen(
-							GamePlayScreen.this);
-					if (_gameLevel.hasError()) {
-						Dialog.alert(_gameLevel.getErrorMessage());
+			onGameQuit();
+		}
+	}
+
+	/**
+	 * when game level has
+	 */
+	private void onGameQuit() {
+		UiApplication.getUiApplication().invokeLater(new Runnable() {
+			public void run() {
+				boolean restart = false;
+				if (_gameLevel.hasError()) {
+					Dialog.alert(_gameLevel.getErrorMessage());
+				} else {
+					if (_gameLevel.wasWon()) {
+						Dialog.alert("Parabéns, você conseguiu.");
+					} else //
+					if (_gameLevel.wasLost()) {
+						final int TENTAR_NOVAMENTE = 0;
+						int response = Dialog.ask("Você perdeu.", new String[] {
+								"Tentar novamente", "Sair" }, TENTAR_NOVAMENTE);
+						restart = (response == TENTAR_NOVAMENTE);
 					} else {
-						if (_gameLevel.wasWon()) {
-							Dialog.alert("Parabéns, você conseguiu.");
-						} else {
-							Dialog.alert("Que pena... \nTente novamente.");
-						}
+						// user quits
 					}
 				}
-			});
-		}
+				if (restart) {
+					GamePlayScreen.this.startGame();
+				} else {
+					UiApplication.getUiApplication().popScreen(
+							GamePlayScreen.this);
+				}
+			}
+		});
 	}
 
 	// This method is called when the invalidate method is called from the

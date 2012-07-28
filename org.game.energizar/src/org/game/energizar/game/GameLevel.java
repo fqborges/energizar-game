@@ -32,10 +32,10 @@ public class GameLevel {
 		_hasError = false;
 		_errorMessage = null;
 
-		// level starts with 3 tries
+		// level starts with only 1 tries to make it easy
 		_ended = false;
 		_won = false;
-		_tries = 3;
+		_tries = 1;
 
 		// 1. parse level data
 		char[][] parsedLevelData = parseLevelData(levelData);
@@ -226,6 +226,13 @@ public class GameLevel {
 	 */
 	public boolean wasWon() {
 		return _ended && _won;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean wasLost() {
+		return _ended && !_won;
 	}
 
 }

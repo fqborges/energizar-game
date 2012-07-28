@@ -22,13 +22,13 @@ public class GameLevelRepository {
 	}
 
 	public String[] getGameLevels() {
-		return new String[] { LEVEL_1, LEVEL_2, LEVEL_3 };
+		return new String[] { LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4 };
 	}
 
 	/**
 	 * Data for Level One
 	 */
-	public static final String LEVEL_1 = "" + //
+	private static final String LEVEL_1 = "" + //
 			// 2 3 4 5 6 7 8 9 0
 			" , , , , , , , , , ;" + // 1
 			" , , , , , , , , , ;" + // 2
@@ -44,7 +44,7 @@ public class GameLevelRepository {
 	/**
 	 * Data for Level Two
 	 */
-	public static final String LEVEL_2 = "" + //
+	private static final String LEVEL_2 = "" + //
 			// 2 3 4 5 6 7 8 9 0
 			" , , , , , , , , , ;" + // 1
 			" , , , , , , , , , ;" + // 2
@@ -60,7 +60,7 @@ public class GameLevelRepository {
 	/**
 	 * Data for Level Two
 	 */
-	public static final String LEVEL_3 = "" + //
+	private static final String LEVEL_3 = "" + //
 			// 2 3 4 5 6 7 8 9 0
 			" , , , , , , , , , ;" + // 1
 			" , , , , , , , , , ;" + // 2
@@ -70,6 +70,22 @@ public class GameLevelRepository {
 			" , , , , , , , , , ;" + // 6
 			" , , , , , , , , , ;" + // 7
 			" , , , , , ,*, , , ;" + // 8
+			" , , , , , , , , , ;" + // 9
+			" , , , , , , , , , ;"; // 0
+
+	/**
+	 * Data for Level Two
+	 */
+	private static final String LEVEL_4 = "" + //
+			// 2 3 4 5 6 7 8 9 0
+			" , , , , , , , , , ;" + // 1
+			" , , , , , , , , , ;" + // 2
+			" , , , , , , , , , ;" + // 3
+			" , , , , , , , , , ;" + // 4
+			">, , , , , , , , ,<;" + // 5
+			" , , , , , , , , , ;" + // 6
+			" , , , , , , , , , ;" + // 7
+			" , , , , , , , , , ;" + // 8
 			" , , , , , , , , , ;" + // 9
 			" , , , , , , , , , ;"; // 0
 

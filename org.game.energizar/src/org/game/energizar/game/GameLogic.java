@@ -297,7 +297,7 @@ public class GameLogic {
 
 		// setup a timer to deactivate game
 		OBJ timerToEnd = new OBJ(OBJType.TIMER);
-		timerToEnd.setTimer(new Timer(20) {
+		timerToEnd.setTimer(new Timer(500) {
 			protected void run(GameLevel gameLevel) {
 				gameLevel.deactivateGame();
 			}

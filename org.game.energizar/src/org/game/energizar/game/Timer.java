@@ -2,16 +2,14 @@ package org.game.energizar.game;
 
 public class Timer {
 
-	private final int ticks;
-	private int count;
-	private boolean disabled;
+	private final int _time;
+	private int _count;
+	private boolean _disabled;
 
-	private Runnable event;
-
-	public Timer(int timeInTicks) {
-		this.ticks = timeInTicks;
-		this.count = 0;
-		this.disabled = false;
+	public Timer(int timeInMilliseconds) {
+		this._time = timeInMilliseconds;
+		this._count = 0;
+		this._disabled = false;
 	}
 
 	/**
@@ -24,27 +22,26 @@ public class Timer {
 	 * 
 	 */
 	public void tick(int milliseconds, GameLevel gameLevel) {
-		if (this.disabled) {
+		if (this._disabled) {
 			return;
 		} else {
-			this.count++;
-			if (this.count > ticks) {
+			int lastCount = this._count;
+			this._count += milliseconds;
+			boolean trigger = (lastCount < _time) && (this._count >= _time);
+			if (trigger) {
 				run(gameLevel);
 			}
 		}
 	}
 
 	protected void run(GameLevel gameLevel) {
-		if (this.event != null) {
-			this.event.run();
-		}
 	}
 
 	public void reset() {
-		this.count = 0;
+		this._count = 0;
 	}
 
 	public void disable() {
-		this.disabled = true;
+		this._disabled = true;
 	}
 }

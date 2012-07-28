@@ -5,6 +5,12 @@ import java.util.Vector;
 
 import net.rim.device.api.ui.XYPoint;
 
+/**
+ * Class to process game specific rules based on the state of game objects.
+ * 
+ * @author Filipe Borges <fqborges@gmail.com>
+ * 
+ */
 public class GameLogic {
 
 	// Singleton field

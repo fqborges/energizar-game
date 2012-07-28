@@ -89,7 +89,11 @@ public class GamePlayScreen extends FullScreen {
 					if (_gameLevel.hasError()) {
 						Dialog.alert(_gameLevel.getErrorMessage());
 					} else {
-						Dialog.alert("Game Over");
+						if (_gameLevel.wasWon()) {
+							Dialog.alert("Parabéns, você conseguiu.");
+						} else {
+							Dialog.alert("Que pena... \nTente novamente.");
+						}
 					}
 				}
 			});

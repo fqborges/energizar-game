@@ -27,4 +27,11 @@ public class ArtResource {
 		return sprite;
 	}
 
+	/**
+	 * @return
+	 */
+	public Sprite getErrorSprite() {
+		return getSprite(7, 7);
+	}
+
 }

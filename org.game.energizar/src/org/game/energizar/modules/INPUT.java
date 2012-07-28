@@ -51,7 +51,7 @@ public class INPUT {
 		// }
 
 		if (charsJustDown[Keypad.KEY_ESCAPE]) {
-			gameData.endGame();
+			gameData.deactivateGame();
 		}
 
 		if (charsJustDown[Keypad.KEY_SPACE]) {

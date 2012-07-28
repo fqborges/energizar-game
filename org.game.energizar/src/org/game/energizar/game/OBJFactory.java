@@ -130,13 +130,16 @@ public class OBJFactory {
 		final OBJ obj = new OBJ(OBJType.ENDPOINT);
 
 		obj.setPos(x, y);
+		obj.poweredPowerOff();
 
 		SpriteProvider spriteProvider = new SpriteProvider() {
 			public Sprite getSprite() {
 				if (obj.getPoweredState() == OBJ.POWER_ON) {
 					return ArtResource.instance().getSprite(2, 0);
-				} else {
+				} else if (obj.getPoweredState() == OBJ.POWER_OFF) {
 					return ArtResource.instance().getSprite(2, 1);
+				} else {
+					return ArtResource.instance().getErrorSprite();
 				}
 			}
 		};

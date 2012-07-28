@@ -56,11 +56,8 @@ public class GameLogic {
 		// cleanup all objects
 		cleanupNullObjects(gameLevel);
 
-		// verify game state
-		if (gameLevel.getRemainingTries() <= 0) {
-			gameLevel.endGame();
-		}
-
+		// verify conditions to end the game
+		processEndConditions(gameLevel);
 	}
 
 	/**
@@ -119,12 +116,9 @@ public class GameLogic {
 				// and (possibly) connects to other object
 				OBJ connection = OBJFactory.instance().createConnection(
 						currObj, bullet);
-				// currObj.setConnectedConnection(connection);
-				// bullet.setConnectedConnection(connection);
 				gameLevel.objects().addElement(connection);
 
 				// TODO
-				// currObj.junctionNotifyConected();
 				currObj.notifyShotHandled();
 
 				// now there is no focused object
@@ -134,28 +128,39 @@ public class GameLogic {
 	}
 
 	/**
-	 * Removes from game all NULL objects.
 	 * 
 	 * @param gameLevel
-	 *            current game data
 	 */
-	private void cleanupNullObjects(GameLevel gameLevel) {
+	private void processEndConditions(GameLevel gameLevel) {
+		// but only if the game has not ended yet
+		if (!gameLevel.isEnded()) {
+			// 1. if the game current object is the endpoint
+			if (gameLevel.getFocusedObject() != null
+					&& gameLevel.getFocusedObject().getTypeID() == OBJType.ENDPOINT) {
 
-		Vector objsInLevel = gameLevel.objects();
-		Vector objsToDelete = new Vector();
+				// 2. if there is a powerable object unpowered you lose!
+				for (Enumeration eachObject = gameLevel.objects().elements(); eachObject
+						.hasMoreElements();) {
 
-		// finds all null objects
-		for (Enumeration eachObject = objsInLevel.elements(); eachObject
-				.hasMoreElements();) {
-			OBJ object = (OBJ) eachObject.nextElement();
-			if (object.getTypeID() == OBJType.NULL) {
-				objsToDelete.addElement(object);
+					// 2.1 foreach powerable object
+					OBJ object = (OBJ) eachObject.nextElement();
+
+					// 2.2 if this object is powered off
+					if (object.getPoweredState() == OBJ.POWER_OFF) {
+						// you lose the game!
+						endTheGame(gameLevel, false);
+						return;
+					}
+				}
+
+				// 3. else you win the game!
+				endTheGame(gameLevel, true);
+				return;
+			} else // case you have lost all tries to shot you lose
+			if (gameLevel.getRemainingTries() <= 0) {
+				// you lose the game!
+				endTheGame(gameLevel, false);
 			}
-		}
-		// deletes all null objects
-		for (Enumeration eToBeDeleted = objsToDelete.elements(); eToBeDeleted
-				.hasMoreElements();) {
-			gameLevel.objects().removeElement((OBJ) eToBeDeleted.nextElement());
 		}
 	}
 
@@ -197,55 +202,26 @@ public class GameLogic {
 
 		// if it hits an object
 		if (bHit) {
-
-			// if it hit a unpowered junction
-			if (theHitObject.getTypeID() == OBJType.JUNCTION
-					&& theHitObject.getPoweredState() == OBJ.POWER_OFF) {
-				OBJ junction = theHitObject;
+			// if it hit a unpowered powerable object
+			if (theHitObject.getPoweredState() == OBJ.POWER_OFF) {
+				OBJ powerable = theHitObject;
 
 				// powers on and focus the junction
-				junction.poweredPowerOn();
-				gameLevel.setFocusedObject(junction);
+				powerable.poweredPowerOn();
+				gameLevel.setFocusedObject(powerable);
 
 				// gets the bullet connection
 				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
 						gameLevel);
 				if (connection != null) {
 					// it now target the hit object
-					connection.setConnectionTargetObject(junction);
+					connection.setConnectionTargetObject(powerable);
 				}
 				// destroy the bullet
 				OBJ.nullify(bullet);
-
-			} else
-			// if hit the endpoint
-			if (theHitObject.getTypeID() == OBJType.ENDPOINT) {
-				OBJ endpoint = theHitObject;
-
-				// powers on the endpoint
-				endpoint.poweredPowerOn();
-
-				// gets the bullet connection
-				OBJ connection = OBJ.getFirstFoundConnectedConnection(bullet,
-						gameLevel);
-				if (connection != null) {
-					// it now target the hit object
-					connection.setConnectionTargetObject(endpoint);
-				}
-
-				// setup a timer to end the game
-				OBJ timerToEnd = new OBJ(OBJType.TIMER);
-				timerToEnd.setTimer(new Timer(20) {
-					protected void run(GameLevel gameLevel) {
-						gameLevel.endGame();
-					}
-				});
-
-				gameLevel.objects().addElement(timerToEnd);
-				// destroy the bullet
-				OBJ.nullify(bullet);
-			} else {
-				// it hits an unexpected object
+			} else // if the bullet leaves the level
+			if (!gameLevel.getGameArea().contains(bullet.getPos())) {
+				// it is lost
 				handleLostBullet(bullet, gameLevel);
 			}
 
@@ -282,5 +258,54 @@ public class GameLogic {
 
 		// lost this try
 		gameLevel.loseTry();
+	}
+
+	/**
+	 * Removes from game all NULL objects.
+	 * 
+	 * @param gameLevel
+	 *            current game data
+	 */
+	private void cleanupNullObjects(GameLevel gameLevel) {
+
+		Vector objsInLevel = gameLevel.objects();
+		Vector objsToDelete = new Vector();
+
+		// finds all null objects
+		for (Enumeration eachObject = objsInLevel.elements(); eachObject
+				.hasMoreElements();) {
+			OBJ object = (OBJ) eachObject.nextElement();
+			if (object.getTypeID() == OBJType.NULL) {
+				objsToDelete.addElement(object);
+			}
+		}
+		// deletes all null objects
+		for (Enumeration eToBeDeleted = objsToDelete.elements(); eToBeDeleted
+				.hasMoreElements();) {
+			gameLevel.objects().removeElement((OBJ) eToBeDeleted.nextElement());
+		}
+	}
+
+	/**
+	 * 
+	 * @param gameLevel
+	 * @param won
+	 */
+	private void endTheGame(GameLevel gameLevel, boolean won) {
+		// end the game
+		gameLevel.end(won);
+
+		// setup a timer to deactivate game
+		OBJ timerToEnd = new OBJ(OBJType.TIMER);
+		timerToEnd.setTimer(new Timer(20) {
+			protected void run(GameLevel gameLevel) {
+				gameLevel.deactivateGame();
+			}
+		});
+		// and add it to game objects
+		gameLevel.objects().addElement(timerToEnd);
+
+		// no more focused object
+		gameLevel.setFocusedObject(null);
 	}
 }

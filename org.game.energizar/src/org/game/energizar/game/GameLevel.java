@@ -9,13 +9,15 @@ import org.game.energizar.util.StringUtil;
 public class GameLevel {
 
 	Vector _objects;
-	boolean _isActive;
+	boolean _gameActive;
 	private boolean _hasError;
 	private String _errorMessage;
 	private int _height;
 	private int _width;
 	private OBJ _currentObject = null;
 	private int _tries;
+	private boolean _ended;
+	private boolean _won;
 
 	/**
 	 * Creates a new level based on a level data describing this level.
@@ -26,9 +28,13 @@ public class GameLevel {
 
 		// inicializa o menor estado válido
 		_objects = new Vector();
-		_isActive = true;
+		_gameActive = true;
 		_hasError = false;
 		_errorMessage = null;
+
+		// level starts with 3 tries
+		_ended = false;
+		_won = false;
 		_tries = 3;
 
 		// 1. parse level data
@@ -50,7 +56,7 @@ public class GameLevel {
 
 	/**
 	 * 
-	 * @param sLevelData 
+	 * @param sLevelData
 	 * @return matrix of char describing the level
 	 */
 	private static char[][] parseLevelData(String sLevelData) {
@@ -148,7 +154,11 @@ public class GameLevel {
 	}
 
 	public boolean isGameActive() {
-		return _isActive;
+		return _gameActive;
+	}
+
+	public void deactivateGame() {
+		this._gameActive = false;
 	}
 
 	public int getWidth() {
@@ -171,16 +181,12 @@ public class GameLevel {
 		this._currentObject = currentObject;
 	}
 
-	public void endGame() {
-		this._isActive = false;
-	}
-
 	public String getErrorMessage() {
 		return _errorMessage;
 	}
 
 	private void setError(String message) {
-		this._isActive = false;
+		this._gameActive = false;
 		this._hasError = true;
 		this._errorMessage = message;
 	}
@@ -195,6 +201,31 @@ public class GameLevel {
 
 	public void loseTry() {
 		this._tries -= 1;
+	}
+
+	/**
+	 * end this level
+	 * 
+	 * @param won
+	 *            the game was won.
+	 */
+	public void end(boolean won) {
+		this._ended = true;
+		this._won = won;
+	}
+
+	/**
+	 * @return if this level has ended
+	 */
+	public boolean isEnded() {
+		return this._ended;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean wasWon() {
+		return _ended && _won;
 	}
 
 }

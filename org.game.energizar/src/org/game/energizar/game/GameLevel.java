@@ -17,8 +17,12 @@ public class GameLevel {
 	private OBJ _currentObject = null;
 	private int _tries;
 
-	// cria um level do jogo
-	public GameLevel() {
+	/**
+	 * Creates a new level based on a level data describing this level.
+	 * 
+	 * @param levelData
+	 */
+	public GameLevel(String levelData) {
 
 		// inicializa o menor estado válido
 		_objects = new Vector();
@@ -27,80 +31,29 @@ public class GameLevel {
 		_errorMessage = null;
 		_tries = 3;
 
-		// inicializa o restante a partir de uma string
-		// com a descrição do level
-		String sLevelData = "" + //
-				// 2 3 4 5 6 7 8 9 0
-				" , , , , , , , , , ;" + // 1
-				" , , , , , , , , , ;" + // 2
-				" , , , ,*, , , , , ;" + // 3
-				" , , , , , , , , , ;" + // 4
-				">, ,*, , , , , , , ;" + // 5
-				" , , , , , , ,*, ,<;" + // 6
-				" , , , , , , , , , ;" + // 7
-				" , , , , , , , , , ;" + // 8
-				" , , , , , , , , , ;" + // 9
-				" , , , , , , , , , ;"; // 0
+		// 1. parse level data
+		char[][] parsedLevelData = parseLevelData(levelData);
 
-		char[][] parsedLevelData = parseLevelData(sLevelData);
+		// 2. validate
+		String errorMsg = GameLevel.validateLevelData(parsedLevelData);
+		if (errorMsg != null) {
+			this.setError(errorMsg);
+			return;
+		}
 
-		// seta altura e largura
+		// 3. setup game level
 		_height = parsedLevelData.length;
 		_width = parsedLevelData[0].length;
-
-		// percorre os dados para verificar se todas
-		// linhas tem o mesmo tamanho
-		for (int i = 1; i < parsedLevelData.length; i++) {
-			char[] linha = parsedLevelData[i];
-			// no caso de uma linha ter tamanho diferente
-			// entra em estado de erro
-			if (linha.length != _width) {
-				this.setError("Os dados do level estão corrompidos: "
-						+ "Todas linhas devem ter o mesmo tamanho, mas a linha "
-						+ i + "não tem o mesmo tamanho da primeira linha.");
-				return;
-			}
-		}
-
-		// varre os dados e cria um objeto para cada
-		// elemento encontrado
-		for (int i = 0; i < parsedLevelData.length; i++) {
-			char[] linha = parsedLevelData[i];
-			for (int j = 0; j < linha.length; j++) {
-				char c = linha[j];
-				int posX = j;
-				int posY = i;
-
-				OBJ obj = null;
-				switch (c) {
-				case '*':
-					obj = OBJFactory.instance().createJunction(posX, posY);
-					break;
-				case '>':
-					obj = OBJFactory.instance().createStartPoint(posX, posY);
-					break;
-				case '<':
-					obj = OBJFactory.instance().createEndPoint(posX, posY);
-					break;
-				}
-				if (obj != null) {
-					this.objects().addElement(obj);
-					if (obj.getTypeID() == OBJType.STARTPOINT) {
-						this.setFocusedObject(obj);
-					}
-				}
-			}
-		}
+		createLevelObjects(parsedLevelData);
 
 	}
 
-	private void setError(String message) {
-		this._isActive = false;
-		this._hasError = true;
-		this._errorMessage = message;
-	}
-
-	private char[][] parseLevelData(String sLevelData) {
+	/**
+	 * 
+	 * @param sLevelData 
+	 * @return matrix of char describing the level
+	 */
+	private static char[][] parseLevelData(String sLevelData) {
 
 		char[][] parsedLevel;
 
@@ -128,6 +81,66 @@ public class GameLevel {
 		}
 
 		return parsedLevel;
+	}
+
+	/**
+	 * @param parsedLevelData
+	 * @return
+	 */
+	private static String validateLevelData(char[][] parsedLevelData) {
+		// * for now the only validation is all lines must have same width
+
+		// get width of first line
+		int width = parsedLevelData[0].length;
+
+		// percorre os dados para verificar se todas
+		// linhas tem o mesmo tamanho
+		for (int i = 1; i < parsedLevelData.length; i++) {
+			char[] linha = parsedLevelData[i];
+			// no caso de uma linha ter tamanho diferente
+			// entra em estado de erro
+			if (linha.length != width) {
+				String message = "Os dados do level estão corrompidos: "
+						+ "Todas linhas devem ter o mesmo tamanho, mas a linha "
+						+ i + "não tem o mesmo tamanho da primeira linha.";
+				return message;
+			}
+		}
+		// no errors, no message
+		return null;
+	}
+
+	private void createLevelObjects(char[][] parsedLevelData) {
+		// varre os dados e cria um objeto para cada
+		// elemento encontrado
+		for (int i = 0; i < parsedLevelData.length; i++) {
+			char[] linha = parsedLevelData[i];
+			for (int j = 0; j < linha.length; j++) {
+				char c = linha[j];
+				int posX = j;
+				int posY = i;
+
+				OBJ obj = null;
+				switch (c) {
+				case '*':
+					obj = OBJFactory.instance().createJunction(posX, posY);
+					break;
+				case '>':
+					obj = OBJFactory.instance().createStartPoint(posX, posY);
+					break;
+				case '<':
+					obj = OBJFactory.instance().createEndPoint(posX, posY);
+					break;
+				}
+				if (obj != null) {
+					Vector objects = this.objects();
+					objects.addElement(obj);
+					if (obj.getTypeID() == OBJType.STARTPOINT) {
+						this.setFocusedObject(obj);
+					}
+				}
+			}
+		}
 	}
 
 	public Vector objects() {
@@ -166,7 +179,13 @@ public class GameLevel {
 		return _errorMessage;
 	}
 
-	public boolean getError() {
+	private void setError(String message) {
+		this._isActive = false;
+		this._hasError = true;
+		this._errorMessage = message;
+	}
+
+	public boolean hasError() {
 		return this._hasError;
 	}
 

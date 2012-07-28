@@ -7,6 +7,7 @@ import net.rim.device.api.ui.container.FullScreen;
 
 import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.GameLogic;
+import org.game.energizar.game.levels.GameLevels;
 import org.game.energizar.modules.GFX;
 import org.game.energizar.modules.INPUT;
 
@@ -35,7 +36,7 @@ public class GamePlayScreen extends FullScreen {
 	public GamePlayScreen() {
 
 		// level corrente
-		_gameLevel = new GameLevel();
+		_gameLevel = new GameLevel(GameLevels.LEVEL_3);
 
 		// inicializa a instância do gameloop
 		_gameLoop = new GamePlayLoop();
@@ -85,7 +86,7 @@ public class GamePlayScreen extends FullScreen {
 				public void run() {
 					UiApplication.getUiApplication().popScreen(
 							GamePlayScreen.this);
-					if (_gameLevel.getError()) {
+					if (_gameLevel.hasError()) {
 						Dialog.alert(_gameLevel.getErrorMessage());
 					} else {
 						Dialog.alert("Game Over");

@@ -29,7 +29,8 @@ public final class MainMenuScreen extends MainScreen {
 
 			public void fieldChanged(Field field, int context) {
 				UiApplication.getUiApplication().pushScreen(
-						new GamePlayScreen());
+				// new GamePlayScreen());
+						new SelectLevelScreen());
 			}
 		});
 

@@ -7,7 +7,6 @@ import net.rim.device.api.ui.container.FullScreen;
 
 import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.GameLogic;
-import org.game.energizar.game.levels.GameLevels;
 import org.game.energizar.modules.GFX;
 import org.game.energizar.modules.INPUT;
 
@@ -33,10 +32,10 @@ public class GamePlayScreen extends FullScreen {
 
 	// O construtor inicializa o jogo e dispara a thread que
 	// executa o loop do jogo
-	public GamePlayScreen() {
+	public GamePlayScreen(String levelData) {
 
 		// level corrente
-		_gameLevel = new GameLevel(GameLevels.LEVEL_3);
+		_gameLevel = new GameLevel(levelData);
 
 		// inicializa a instância do gameloop
 		_gameLoop = new GamePlayLoop();

@@ -29,7 +29,7 @@ public class GameLevelRepository {
 		// create a level
 		level = new LevelDescriptor("Level Um", LEVEL_DATA_1,
 				"O objetivo é levar energia até a casinha.\n\n"
-						+ "Para disparar energia use <espaco>.");
+						+ "Para disparar energia use espaço ou clique.");
 		levelList.addElement(level);// create a level
 		level = new LevelDescriptor("Level Dois", LEVEL_DATA_2,
 				"Um ponto de conexão de energia movimenta-se quando energizado!\n"
@@ -128,7 +128,7 @@ public class GameLevelRepository {
 	private static final String LEVEL_DATA_5 = "" + //
 			// 2 3 4 5 6 7 8 9 0
 			"#,#,#,#,#,#,#,#,#,#;" + // 1
-			"#, , , , , , , , ,#;" + // 2
+			"#, , ,#, , , , , ,#;" + // 2
 			"#,*, , , ,*, ,*, ,#;" + // 3
 			"#, ,', , , ,*, , , ;" + // 4
 			">, , ,*, , , , , ,<;" + // 5

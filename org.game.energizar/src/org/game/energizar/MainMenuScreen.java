@@ -4,6 +4,8 @@ import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.Manager;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.BitmapField;
@@ -54,7 +56,7 @@ public final class MainMenuScreen extends MainScreen {
 		// set main image
 		Bitmap bmpBG = Bitmap.getBitmapResource("mainbg.png");
 		BitmapField bmfMainImage = new BitmapField(bmpBG, Field.FIELD_HCENTER);
-		bmfMainImage.setMargin(64, 0, 64, 0);
+		bmfMainImage.setMargin(32, 0, 32, 0);
 		vfm.add(bmfMainImage);
 
 		// button Start to open SelectLevelScreen
@@ -68,8 +70,32 @@ public final class MainMenuScreen extends MainScreen {
 			}
 		});
 		vfm.add(btnStartgame);
+		// create a label and chage font and color
+		LabelField cc = new LabelField("arte baseada em:\n"
+				+ "http://opengameart.org/content/grayscale-icons",
+				Field.FOCUSABLE | LabelField.HCENTER) {
+			protected void paint(Graphics graphics) {
+				graphics.setColor(Color.GRAY);
+				super.paint(graphics);
+			}
+		};
+		Font font = cc.getFont();
+		font = font.derive(font.getStyle(), (int) (font.getHeight() * 0.75f));
+		cc.setFont(font);
+		vfm.add(cc);
 
 		// add vfm to hfm to center it on screen
 		hfm.add(vfm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * never prompt user
+	 * 
+	 * @see net.rim.device.api.ui.container.MainScreen#onSavePrompt()
+	 */
+	protected boolean onSavePrompt() {
+		return true;
 	}
 }

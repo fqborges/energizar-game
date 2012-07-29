@@ -1,6 +1,7 @@
 package org.game.energizar;
 
 import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.TouchEvent;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.container.FullScreen;
@@ -175,4 +176,22 @@ public class GamePlayScreen extends FullScreen {
 		return INPUT.instance().receiveNavigationMovement(dx, dy, status, time);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.rim.device.api.ui.Screen#navigationClick(int, int)
+	 */
+	protected boolean navigationClick(int status, int time) {
+		return INPUT.instance().receiveNavigationClick(status, time);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.rim.device.api.ui.Screen#touchEvent(net.rim.device.api.ui.TouchEvent)
+	 */
+	protected boolean touchEvent(TouchEvent message) {
+		return INPUT.instance().receiveTouchEvent(message);
+	}
 }

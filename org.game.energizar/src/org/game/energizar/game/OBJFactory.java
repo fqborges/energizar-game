@@ -41,7 +41,7 @@ public class OBJFactory {
 					if (this.getPoweredState() == OBJ.POWER_ON
 							&& !OBJ.isSourceOfAnyConnection(this, gameData)) {
 						final OBJ thisRef = this;
-						this.setTimer(new Timer(250) {
+						this.setTimer(new Timer(400) {
 							protected void run(GameLevel gameData) {
 								// if junction is off or is connected then
 								// disarm

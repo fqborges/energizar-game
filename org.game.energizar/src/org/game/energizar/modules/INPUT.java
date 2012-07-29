@@ -1,6 +1,7 @@
 package org.game.energizar.modules;
 
 import net.rim.device.api.ui.Keypad;
+import net.rim.device.api.ui.TouchEvent;
 
 import org.game.energizar.game.GameLevel;
 import org.game.energizar.game.OBJ;
@@ -14,6 +15,7 @@ public class INPUT {
 	boolean[] charsJustUp = new boolean[NUM_CHARS];
 	int moveDx = 0;
 	int moveDy = 0;
+	private boolean click = false;
 
 	// Singleton field
 	private static INPUT _instance = new INPUT();
@@ -39,7 +41,7 @@ public class INPUT {
 			gameData.deactivateGame();
 		}
 
-		if (charsJustDown[Keypad.KEY_SPACE]) {
+		if (charsJustDown[Keypad.KEY_SPACE] || click) {
 			OBJ o = gameData.getFocusedObject();
 
 			if (o != null) {
@@ -64,6 +66,7 @@ public class INPUT {
 		}
 		moveDx = 0;
 		moveDy = 0;
+		click = false;
 	}
 
 	public boolean receiveKeyChar(char key, int status, int time) {
@@ -89,6 +92,26 @@ public class INPUT {
 
 		this.moveDx += dx;
 		this.moveDy += dy;
+		return true;
+	}
+
+	public boolean receiveNavigationClick(int status, int time) {
+		this.click = true;
+		return true;
+	}
+
+	/**
+	 * @param message
+	 * @return
+	 */
+	public boolean receiveTouchEvent(TouchEvent message) {
+		switch (message.getEvent()) {
+		case TouchEvent.DOWN:
+			this.click = true;
+			break;
+		default:
+			break;
+		}
 		return true;
 	}
 

@@ -131,6 +131,9 @@ public class GameLevel {
 				case '*':
 					obj = OBJFactory.instance().createJunction(posX, posY);
 					break;
+				case '#':
+					obj = OBJFactory.instance().createBlock(posX, posY);
+					break;
 				case '>':
 					obj = OBJFactory.instance().createStartPoint(posX, posY);
 					break;

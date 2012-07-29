@@ -30,7 +30,7 @@ public class ArtResource {
 	/**
 	 * @return
 	 */
-	public Sprite getErrorSprite() {
+	public Sprite getErrorSprite() { 
 		return getSprite(7, 7);
 	}
 

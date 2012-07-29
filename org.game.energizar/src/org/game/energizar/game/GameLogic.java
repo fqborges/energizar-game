@@ -219,8 +219,7 @@ public class GameLogic {
 				}
 				// destroy the bullet
 				OBJ.nullify(bullet);
-			} else // if the bullet leaves the level
-			if (!gameLevel.getGameArea().contains(bullet.getPos())) {
+			} else {// if it hits something else
 				// it is lost
 				handleLostBullet(bullet, gameLevel);
 			}

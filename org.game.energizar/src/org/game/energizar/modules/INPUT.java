@@ -35,21 +35,6 @@ public class INPUT {
 
 	public void process(GameLevel gameData, int milliseconds) {
 
-		// OBJ o = (OBJ) gameData.objects().elementAt(0);
-		//
-		// if (moveDx > 0) {
-		// o.moveRight();
-		// }
-		// if (moveDx < 0) {
-		// o.moveLeft();
-		// }
-		// if (moveDy > 0) {
-		// o.moveDown();
-		// }
-		// if (moveDy < 0) {
-		// o.moveUp();
-		// }
-
 		if (charsJustDown[Keypad.KEY_ESCAPE]) {
 			gameData.deactivateGame();
 		}

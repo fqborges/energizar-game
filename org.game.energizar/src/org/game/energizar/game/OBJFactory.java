@@ -41,7 +41,7 @@ public class OBJFactory {
 					if (this.getPoweredState() == OBJ.POWER_ON
 							&& !OBJ.isSourceOfAnyConnection(this, gameData)) {
 						final OBJ thisRef = this;
-						this.setTimer(new Timer(500) {
+						this.setTimer(new Timer(250) {
 							protected void run(GameLevel gameData) {
 								// if junction is off or is connected then
 								// disarm
@@ -120,6 +120,19 @@ public class OBJFactory {
 
 		int row = 2;
 		int col = 7;
+		Sprite sprite = ArtResource.instance().getSprite(row, col);
+		obj.setSpriteProvider(new SimpleSpriteProvider(sprite));
+
+		return obj;
+	}
+
+	public OBJ createBlock(int x, int y) {
+		final OBJ obj = new OBJ(OBJType.BRICK);
+
+		obj.setPos(x, y);
+
+		int row = 4;
+		int col = 0;
 		Sprite sprite = ArtResource.instance().getSprite(row, col);
 		obj.setSpriteProvider(new SimpleSpriteProvider(sprite));
 

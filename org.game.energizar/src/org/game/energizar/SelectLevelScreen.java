@@ -77,12 +77,6 @@ public class SelectLevelScreen extends MainScreen {
 				String name = level.getName();
 
 				// cria os campos
-				Bitmap bmpOrig = Bitmap.getBitmapResource("explosao.png");
-				Bitmap bmpIcone = new Bitmap(48, 48);
-				bmpIcone.createAlpha();
-				bmpOrig.scaleInto(bmpIcone, Bitmap.FILTER_BILINEAR);
-				BitmapField bmfIcone = new BitmapField(bmpIcone);
-
 				LabelField lblName = new LabelField(name, Field.USE_ALL_WIDTH
 						| DrawStyle.ELLIPSIS);
 
@@ -95,19 +89,13 @@ public class SelectLevelScreen extends MainScreen {
 		Border borderBottom = BorderFactory.createSimpleBorder(new XYEdges(0,
 				0, 1, 0), Border.STYLE_SOLID);
 
-		// RegionStyles iconeStyle = new RegionStyles(borderBottom, null, null,
-		// null, RegionStyles.ALIGN_CENTER, RegionStyles.ALIGN_MIDDLE);
 		RegionStyles styleName = new RegionStyles(borderBottom,
 				Font.getDefault(), null, null, RegionStyles.ALIGN_LEFT,
 				RegionStyles.ALIGN_MIDDLE);
 		// col,row colsxrows
 		// | 0,0 1x1 | 1,0 1x1 |
 		dtTemplate.createRegion(new XYRect(0, 0, 1, 1), styleName);
-		// dtTemplate.createRegion(new XYRect(1, 0, 1, 1), valorStyle);
 		dtTemplate.setRowProperties(0, new TemplateRowProperties(60));
-		// dtTemplate.setColumnProperties(0, new TemplateColumnProperties(60));
-		// dtTemplate.setColumnProperties(1,
-		// new TemplateColumnProperties(Display.getWidth() - 60));
 		dtTemplate.setColumnProperties(0,
 				new TemplateColumnProperties(Display.getWidth()));
 		dtTemplate.useFixedHeight(true);
